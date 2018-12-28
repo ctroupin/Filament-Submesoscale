@@ -1,0 +1,285 @@
+import os
+import netCDF4
+import logging
+import datetime
+import numpy as np
+import seawater
+from osgeo import gdal
+from scipy import interpolate
+import matplotlib.pyplot as plt
+import cartopy
+import matplotlib.patches as patches
+from matplotlib.path import Path
+from mpl_toolkits.mplot3d import Axes3D
+from geopy.distance import vincenty
+import cmocean
+import scipy.io as sio
+import warnings
+import matplotlib.cbook
+warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
+
+class SST(object):
+    """
+    Sea surface temperature field
+    """
+
+    def __init__(self, lon=None, lat=None, field=None, qflag=None,
+                 year=None, dayofyear=None, date=None):
+        self.lon = lon
+        self.lat = lat
+        self.field = field
+        self.qflag = qflag
+        self.timeunits = year
+        self.year = year
+        self.dayofyear = dayofyear
+        self.date = date
+
+    def read_from_oceancolorL2(self, filename):
+        """
+        Load the SST from netCDF L2 file obtained from
+        https://oceancolor.gsfc.nasa.gov
+        :param filename: name of the netCDF file
+        :return: lon, lat, field, qflag, year, dayofyear
+        """
+
+        if os.path.exists(filename):
+            with netCDF4.Dataset(filename) as nc:
+                # Read platform
+                sat = nc.platform
+                # Read time information
+                # Assume all the measurements made the same day (and same year)
+                self.year = int(nc.groups['scan_line_attributes'].variables['year'][0])
+                self.dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
+                # Convert to date
+                self.date = datetime.datetime(self.year, 1, 1) + datetime.timedelta(self.dayofyear - 1)
+                # Read coordinates
+                self.lon = nc.groups['navigation_data'].variables['longitude'][:]
+                self.lat = nc.groups['navigation_data'].variables['latitude'][:]
+                # Read geophysical variables
+                try:
+                    self.field = nc.groups['geophysical_data'].variables['sst'][:]
+                    self.qflag = nc.groups['geophysical_data'].variables['qual_sst'][:]
+                except KeyError:
+                    self.field = nc.groups['geophysical_data'].variables['sst4'][:]
+                    self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
+
+    def apply_qc(self, qf=1):
+        """
+        Mask the sst values which don't match the mentioned quality flag
+        """
+        self.field = np.ma.masked_where(self.qflag != 1, self.field)
+
+    def get_title(self, filename):
+        """
+        Construct the title string based on the sensor, platform and date
+        """
+        with netCDF4.Dataset(filename, "r") as nc:
+            titletext = "{} ({}), {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
+
+        return titletext
+
+    def get_figname(self, filename):
+        """
+        Construct the figure name based on the sensor and the date
+        """
+        with netCDF4.Dataset(filename, "r") as nc:
+            figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
+
+        return figname
+
+class Visible(object):
+    def __init__(self, lon=None, lat=None, array=None):
+        self.lon = lon
+        self.lat = lat
+        self.array = array
+
+
+    def read_from(self, filename):
+
+        gtif = gdal.Open(filename)
+
+        # info about the projection
+        arr = gtif.ReadAsArray()
+        trans = gtif.GetGeoTransform()
+        self.extent = (trans[0], trans[0] + gtif.RasterXSize*trans[1],
+                  trans[3] + gtif.RasterYSize*trans[5], trans[3])
+        # Permute dimensions
+        self.array = np.transpose(arr, (1, 2, 0))
+
+        x = np.arange(0, gtif.RasterXSize)
+        y = np.arange(0, gtif.RasterYSize)
+        xx, yy = np.meshgrid(x, y)
+
+        self.lon = trans[1] * xx + trans[2] * yy + trans[0]
+        self.lat = trans[4] * xx + trans[5] * yy + trans[3]
+
+class Altimetry(object):
+
+    """
+    SLA field from altimetry
+    """
+
+    def __init__(self, lon=None, lat=None, sla=None, u=None, v=None,
+                 time=None, date=None, speed=None):
+        self.lon = lon
+        self.lat = lat
+        self.sla = sla
+        self.u = u
+        self.v = v
+        self.time = time
+        self.speed = speed
+
+    def read_from_aviso(self, filename):
+        """
+
+        :param filename: name of the netCDF file
+        :return: lon, lat, SLA, u, v, time
+        """
+
+        if os.path.exists(filename):
+            with netCDF4.Dataset(filename) as nc:
+                self.lon = nc.get_variables_by_attributes(standard_name='longitude')[0][:]
+                self.lat = nc.get_variables_by_attributes(standard_name='latitude')[0][:]
+                self.time = nc.get_variables_by_attributes(standard_name='time')[0][:]
+                timeunits = nc.get_variables_by_attributes(standard_name='time')[0].units
+                self.date = netCDF4.num2date(self.time, timeunits)
+
+                self.sla = nc.get_variables_by_attributes(standard_name='sea_surface_height_above_sea_level')[0][0,:]
+                self.u = nc.get_variables_by_attributes(standard_name='surface_geostrophic_eastward_sea_water_velocity')[0][0,:]
+                self.v = nc.get_variables_by_attributes(standard_name='surface_geostrophic_northward_sea_water_velocity')[0][0,:]
+
+    def get_speed(self):
+        """
+        Compute current speed
+        """
+
+        self.speed = np.sqrt(self.u * self.u + self.v * self.v )
+        self.speed = np.ma.masked_greater(self.speed, 1.5)
+
+    def get_vort(self):
+        llon, llat = np.meshgrid(self.lon, self.lat)
+        dx = llon[:, 1:] - llon[:, :-1]
+        dy = llat[1:, :] - llat[:-1, :]
+        dux, duy = np.gradient(self.u)
+        dvx, dvy = np.gradient(self.v)
+        self.vort = dvx/dx.mean() - duy/dy.mean()
+
+    def plot_streamline(self, m=None, cmap=plt.cm.RdBu_r, vmax=0.15, density=3):
+
+        if m is not None:
+            llon, llat = np.meshgrid(self.lon, self.lat)
+            self.sla[self.sla >= vmax] = vmax
+            self.sla[self.sla <= -vmax] = -vmax
+            m.streamplot(llon, llat, self.u, self.v, color=self.sla,
+                       arrowstyle="fancy", density=density, linewidth=.5, cmap=cmap, latlon=True)
+        else:
+            plt.streamplot(self.lon, self.lat, self.u, self.v, color=self.sla,
+                       arrowsize=2, density=density, linewidth=.5, cmap=cmap)
+
+    def plot_sla(self, m=None, cmap=plt.cm.RdBu_r, slalevels=np.arange(-0.3, 0.3, 0.025)):
+
+        if m is not None:
+            llon, llat = np.meshgrid(self.lon, self.lat)
+            xx, yy = m(llon, llat)
+            plt.contour(xx, yy, self.sla, slalevels, cmap=cmap)
+
+        else:
+            plt.contour(self.lon, self.lat, self.sla, slalevels, cmap=cmap)
+
+    def select_domain(self, coordinates):
+        """
+        Subset based on geographical positions
+        """
+        goodlon = np.where(np.logical_and(self.lon >= coordinates[0], self.lon <= coordinates[1]))[0]
+        goodlat = np.where(np.logical_and(self.lat >= coordinates[2], self.lat <= coordinates[3]))[0]
+        self.lon = self.lon[goodlon]
+        self.lat = self.lat[goodlat]
+        self.u = self.u[goodlat, :]
+        self.u = self.u[:, goodlon]
+        self.v = self.v[goodlat, :]
+        self.v = self.v[:, goodlon]
+        self.sla = self.sla[goodlat, :]
+        self.sla = self.sla[:, goodlon]
+
+def prepare_3D_scat():
+
+    fig = plt.figure(figsize=(12, 6))
+    fig.patch.set_facecolor('white')
+
+    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+    ax1.set_aspect('equal')
+    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+    ax2.set_aspect('equal')
+
+    ax1.set_xlabel("Longitude")
+    ax1.set_ylabel("Latitude")
+    ax1.set_xticks(np.arange(-1., 0, 0.2))
+    ax1.set_yticks(np.arange(36.8, 37.2, 0.2))
+    ax1.set_title("Coastal glider")
+
+    ax2.set_xlabel("Longitude")
+    ax2.set_ylabel("Latitude")
+    ax2.set_xticks(np.arange(-1., 0, 0.2))
+    ax2.set_yticks(np.arange(36.8, 37.2, 0.2))
+    ax2.set_title("Deep glider")
+    fig.subplots_adjust(right=0.6)
+    cbar_ax = fig.add_axes([0.65, 0.25, 0.015, 0.5])
+    return fig, ax1, ax2, cbar_ax
+
+def prepare_3D_scat4():
+    fig = plt.figure(figsize=(14, 12))
+    fig.patch.set_facecolor('white')
+
+    ax1 = fig.add_subplot(2, 2, 1, projection='3d')
+    ax1.set_aspect('equal')
+    ax2 = fig.add_subplot(2, 2, 2, projection='3d')
+    ax2.set_aspect('equal')
+    ax3 = fig.add_subplot(2, 2, 3, projection='3d')
+    ax3.set_aspect('equal')
+    ax4 = fig.add_subplot(2, 2, 4, projection='3d')
+    ax4.set_aspect('equal')
+
+    ax1.set_xlabel("Longitude")
+    ax1.set_ylabel("Latitude")
+    ax1.set_xticks(np.arange(-1., 0, 0.2))
+    ax1.set_yticks(np.arange(36.8, 37.2, 0.2))
+    ax1.set_title("Coastal glider", fontsize=18)
+
+    ax2.set_xlabel("Longitude")
+    ax2.set_ylabel("Latitude")
+    ax2.set_xticks(np.arange(-1., 0, 0.2))
+    ax2.set_yticks(np.arange(36.8, 37.2, 0.2))
+    ax2.set_title("Deep glider", fontsize=18)
+
+    ax3.set_xlabel("Longitude")
+    ax3.set_ylabel("Latitude")
+    ax3.set_xticks(np.arange(-1., 0, 0.2))
+    ax3.set_yticks(np.arange(36.8, 37.2, 0.2))
+
+    ax4.set_xlabel("Longitude")
+    ax4.set_ylabel("Latitude")
+    ax4.set_xticks(np.arange(-1., 0, 0.2))
+    ax4.set_yticks(np.arange(36.8, 37.2, 0.2))
+
+
+    fig.subplots_adjust(right=0.8)
+    cbar_ax1 = fig.add_axes([0.85, 0.525, 0.02, 0.35])
+    cbar_ax2 = fig.add_axes([0.85, 0.125, 0.02, 0.35])
+    return fig, ax1, ax2, ax3, ax4, cbar_ax1, cbar_ax2
+
+
+def change_wall_prop(ax, coordinates, depths, angles):
+    ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.w_xaxis.gridlines.set_linestyles(':')
+    ax.w_yaxis.gridlines.set_linestyles(':')
+    ax.w_zaxis.gridlines.set_linestyles(':')
+    ax.view_init(angles[0], angles[1])
+    ax.set_xlim(coordinates[0],coordinates[1])
+    ax.set_ylim(coordinates[2],coordinates[3])
+    ax.set_zlim(depths[0],depths[1])
+    ax.set_zlabel('Depth (m)')
+
+    ax.set_zticks(np.arange(depths[0],depths[1]+10,depths[2]))
+    ax.set_zticklabels(range(int(-depths[0]),-int(depths[1])-10,-int(depths[2])))
