@@ -24,7 +24,7 @@ class SST(object):
     """
 
     def __init__(self, lon=None, lat=None, field=None, qflag=None,
-                 year=None, dayofyear=None, date=None):
+                 year=None, dayofyear=None, date=None, fname=None):
         self.lon = lon
         self.lat = lat
         self.field = field
@@ -33,6 +33,7 @@ class SST(object):
         self.year = year
         self.dayofyear = dayofyear
         self.date = date
+        self.fname = fname
 
     def read_from_oceancolorL2(self, filename):
         """
@@ -43,6 +44,7 @@ class SST(object):
         """
 
         if os.path.exists(filename):
+            self.fname = filename
             with netCDF4.Dataset(filename) as nc:
                 # Read platform
                 sat = nc.platform
@@ -63,31 +65,122 @@ class SST(object):
                     self.field = nc.groups['geophysical_data'].variables['sst4'][:]
                     self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
 
+    def read_from_ghrsst(self, filename):
+        """
+        Load the SST from netCDF GHRSST file obtained from
+        ftp://podaac-ftp.jpl.nasa.gov
+        :param filename: name of the netCDF file
+        :return: lon, lat, field, qflag, year, dayofyear
+        """
+        if os.path.exists(filename):
+            self.fname = filename
+            with netCDF4.Dataset(filename) as nc:
+                time = nc.variables["time"][0]
+                timeunits = nc.variables["time"].units
+                self.date = netCDF4.num2date(time, timeunits)
+                self.lon = nc.variables["lon"][:]
+                self.lat = nc.variables["lat"][:]
+                self.field = nc.variables["sea_surface_temperature"][0,:,:] - 273.15
+                self.qflag = nc.variables["quality_level"][0,:,:]
+
     def apply_qc(self, qf=1):
         """
         Mask the sst values which don't match the mentioned quality flag
         """
-        self.field = np.ma.masked_where(self.qflag != 1, self.field)
+        self.field = np.ma.masked_where(self.qflag > 1, self.field)
 
-    def get_title(self, filename):
+
+    def get_title(self):
         """
         Construct the title string based on the sensor, platform and date
         """
-        with netCDF4.Dataset(filename, "r") as nc:
-            titletext = "{} ({}), {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
-
+        with netCDF4.Dataset(self.fname, "r") as nc:
+            try:
+                titletext = "{} ({}) {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
+            except AttributeError:
+                titletext = "{} ({}) {}".format(nc.sensor, nc.platform, self.date.strftime("%Y-%m-%d"))
         return titletext
 
-    def get_figname(self, filename):
+    def get_figname(self):
         """
         Construct the figure name based on the sensor and the date
         """
-        with netCDF4.Dataset(filename, "r") as nc:
-            figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
-
+        # with netCDF4.Dataset(filename, "r") as nc:
+        #    figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
+        figname = os.path.basename(self.fname)
+        figname = os.path.splitext(figname)[0]
+        figname = figname.replace(".", "-")
         return figname
 
+    def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
+        """
+        Make the plot of the SST on a map
+        Input:
+        m: projection from Basemap
+        figname: name of the figure (None by default, means to figure saved)
+        visfile: name of the file storing the visible scene (None by default)
+        """
+        fig = plt.figure(figsize=(8, 8))
+        ax = plt.subplot(111)
+        if titletext is None:
+            titletext = self.get_title()
+            plt.title(titletext, fontsize=18)
+
+        if swot is not None:
+            m.plot(swot.lon, swot.lat, "k--", ms=0.5, latlon=True,
+                   linewidth=0.5, alpha=0.7, zorder=7)
+
+        if visibleim is not None:
+            m.imshow(np.flipud(visibleim.array), zorder=4)
+                #m.pcolormesh(visibleim.lon, visibleim.lat, visibleim.array[:,:,0], latlon=True,
+                #             cmap=plt.cm.gray, zorder=1, alpha=0.7)
+        else:
+            m.fillcontinents(zorder=4)
+
+
+        pcm = m.pcolormesh(self.lon, self.lat, self.field, latlon=True,
+                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=6)
+        cb = plt.colorbar(pcm, extend="both", shrink=0.75)
+        cb.set_label("$^{\circ}$C", rotation=0, ha="left")
+        m.drawcoastlines(linewidth=0.25)
+        #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
+        #               units='km', fontsize=10, fontcolor='k', zorder=5)
+        m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,0,1),
+                        linewidth=.5, fontsize=12, zorder=3)
+        m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
+                        linewidth=.5, fontsize=12, zorder=3)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
+class Swot(object):
+    def __init__(self, lon=None, lat=None, rad=None):
+        self.lon = lon
+        self.lat = lat
+        self.rad = rad
+
+    def read_from(self, orbitfile):
+        """
+        Read the orbit from a text file
+        """
+        if os.path.exists(orbitfile):
+            self.lon, self.lat, self.rad = np.loadtxt(orbitfile, comments="#", unpack=True)
+            self.lon[self.lon>180.] = self.lon[self.lon>180.] - 360.
+
+    def select_domain(self, coordinates):
+        goodlon = np.where(np.logical_and(self.lon>= coordinates[0], self.lon<= coordinates[1]))[0]
+        goodlat = np.where(np.logical_and(self.lat>= coordinates[2], self.lat<= coordinates[3]))[0]
+        goodcoords = np.intersect1d(goodlon, goodlat)
+        self.lon = self.lon[goodcoords]
+        self.lat = self.lat[goodcoords]
+
+    def add_to_plot(self, m):
+        m.plot(swot.lon, swot.lat, "ko--", ms=0.5, latlon=True)
+
+
 class Visible(object):
+
     def __init__(self, lon=None, lat=None, array=None):
         self.lon = lon
         self.lat = lat
@@ -112,6 +205,20 @@ class Visible(object):
 
         self.lon = trans[1] * xx + trans[2] * yy + trans[0]
         self.lat = trans[4] * xx + trans[5] * yy + trans[3]
+
+    def extract_area(self, coordinates):
+        """
+        Extract the visible image in the region of interest
+        """
+        lonvis = self.lon[0,:]
+        latvis = self.lat[:,0]
+        goodlon = np.where(np.logical_and(lonvis <= coordinates[1], lonvis >= coordinates[0]))[0]
+        goodlat = np.where(np.logical_and(latvis <= coordinates[3], latvis >= coordinates[2]))[0]
+        self.array = self.array[goodlat, :, :]
+        self.array = self.array[:, goodlon, :]
+        self.lon = self.lon[:,goodlon]
+        self.lat = self.lat[goodlat,:]
+
 
 class Altimetry(object):
 
