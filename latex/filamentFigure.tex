@@ -5,7 +5,7 @@
 \usepackage{xcolor}
 \usepackage{subcaption}
 \usepackage{hyperref}
-\usepackage[margin=0.25in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 
 \hypersetup{bookmarksopen=true,
 bookmarksnumbered=true,  
@@ -55,21 +55,21 @@ urlcolor=blue}
 \begin{figure}
 
 \begin{subfigure}[t]{.35\textwidth}
-\caption{Ocean color image using data collected during two orbits of the Suomi-NPP/VIIRS instrument on December 10, 2018. Source: OceanColor \url{https://oceancolor.gsfc.nasa.gov/}}
-\includegraphics[width=\textwidth]{../figures/V2018344.CanaryUpwelling_cropped.jpg}
+\caption{Ocean color image using data collected during two orbits of the Suomi-NPP/VIIRS instrument on December 10, 2018, and showing submesoscale activity off Africa. Source: OceanColor \url{https://oceancolor.gsfc.nasa.gov/}}
+\includegraphics[width=\textwidth]{../figures/CanaryUpwelling_cropped.jpg}
 \end{subfigure}\hspace{1cm}
 \begin{subfigure}[t]{.4\textwidth}
-\caption{Temporal and spatial scales of oceanic processes.}
+\caption{Temporal and spatial scales of oceanic processes. The submesoscale }
 \includegraphics[width=\textwidth]{../figures/oceanscales.png}
 \end{subfigure}
 
 \begin{subfigure}[b]{.85\textwidth}
-\caption{Sea surface temperature for the summer 2018. Black arrows depict wind in the four Eastern Boundary Current Upwelling Systems (EBUS). The large arrows show the mean wind vector averaged over the upwelling areas.}
+\caption{Sea surface temperature for the summer 2018. Black arrows depict wind in the four Eastern Boundary Current Upwelling Systems (EBUS). The large arrows show the mean wind obtained by spatially averaging over the upwelling areas.}
 \includegraphics[width=.85\textwidth]{../figures/SST_wind_summer_2018_08.png}
 \end{subfigure}
 
 \begin{subfigure}[b]{.8\textwidth}
-\caption{Sea surface temperature corresponding to September 4, 2017. An upwelling filament is enlarged inside the circle. Data from VIIRS on board Suomi-NPP.}
+\caption{Sea surface temperature corresponding to September 4, 2017. An upwelling filament extends from the coast at 31$^{\circ}$N approximately is enlarged inside the circle. Note the band of low clouds near the coast, typical from the upwelling areas. Data from the Suomi-NPP/VIIRS instrument.}
 \begin{tikzpicture}[spy using outlines={circle,black,magnification=3,size=3.5cm, connect spies}]
 \node[anchor=south west,inner sep=0] (image) at (0,0) {\pgfimage[interpolate=true,width=.7\textwidth]{../figures/20170904sst2.png}};
    
