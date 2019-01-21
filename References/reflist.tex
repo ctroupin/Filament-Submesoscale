@@ -1,10 +1,39 @@
-\documentclass{article}
+\documentclass[svgnames]{article}
+\usepackage{xcolor}
+\usepackage{fontawesome}
+\usepackage{academicons}
 \usepackage{hyperref}
 \usepackage{doi}
+\usepackage[scale=.85]{geometry}
 
+% Fonts
+\usepackage{fontspec}
+\setmainfont{Carlito}
+
+\definecolor{CVblue}{HTML}{1483D3}
+\definecolor{CVorange}{HTML}{FF9900}
+
+\hypersetup{bookmarksopen=true,
+bookmarksnumbered=true,  
+pdffitwindow=false, 
+pdfstartview=FitH,
+pdftoolbar=false,
+pdfmenubar=false,
+pdfwindowui=true,
+pdfauthor=Charles Troupin,
+pdftitle=Submesoscale and filaments,
+colorlinks=true,%
+breaklinks=true,%
+linkcolor=CVblue,anchorcolor=CVblue,%
+citecolor=CVblue,filecolor=CVblue,%
+menucolor=blue,%
+urlcolor=CVblue}
 
 \begin{document}
 
+\noindent\textcolor{CVblue}{Updated} on \today
+
 \nocite{*}
+\bibliographystyle{referencelist}
 \bibliography{submesoscale.bib}
 \end{document}
