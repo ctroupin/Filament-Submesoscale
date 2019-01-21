@@ -24,16 +24,30 @@ class SST(object):
     """
 
     def __init__(self, lon=None, lat=None, field=None, qflag=None,
-                 year=None, dayofyear=None, date=None, fname=None):
+                 date=None, fname=None):
         self.lon = lon
         self.lat = lat
         self.field = field
         self.qflag = qflag
-        self.timeunits = year
-        self.year = year
-        self.dayofyear = dayofyear
         self.date = date
         self.fname = fname
+
+    def read_from_oceancolorL3(self, filename, coordinates):
+        """
+        Read the coordinates and the SST from a L3 file
+        and subset the domain defined by `coordinates`
+        """
+        with netCDF4.Dataset(filename) as nc:
+            self.fname = filename
+            self.date = datetime.datetime.strptime(nc.time_coverage_end, "%Y-%m-%dT%H:%M:%S.000Z")
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            goodlon = np.where( (lon >= coordinates[0] ) & (lon <= coordinates[1]))[0]
+            goodlat = np.where( (lat >= coordinates[2] ) & (lat <= coordinates[3]))[0]
+            self.field = nc.get_variables_by_attributes(standard_name="sea_surface_temperature")[0][goodlat, goodlon]
+            self.qflag = nc.get_variables_by_attributes(long_name="Quality Levels, Sea Surface Temperature")[0][goodlat, goodlon]
+        self.lon = lon[goodlon]
+        self.lat = lat[goodlat]
 
     def read_from_oceancolorL2(self, filename):
         """
@@ -50,10 +64,10 @@ class SST(object):
                 sat = nc.platform
                 # Read time information
                 # Assume all the measurements made the same day (and same year)
-                self.year = int(nc.groups['scan_line_attributes'].variables['year'][0])
-                self.dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
+                year = int(nc.groups['scan_line_attributes'].variables['year'][0])
+                dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
                 # Convert to date
-                self.date = datetime.datetime(self.year, 1, 1) + datetime.timedelta(self.dayofyear - 1)
+                self.date = datetime.datetime(year, 1, 1) + datetime.timedelta(dayofyear - 1)
                 # Read coordinates
                 self.lon = nc.groups['navigation_data'].variables['longitude'][:]
                 self.lat = nc.groups['navigation_data'].variables['latitude'][:]
@@ -146,6 +160,45 @@ class SST(object):
         #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
         #               units='km', fontsize=10, fontcolor='k', zorder=5)
         m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,0,1),
+                        linewidth=.5, fontsize=12, zorder=3)
+        m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
+                        linewidth=.5, fontsize=12, zorder=3)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
+    def make_plot2(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
+        """
+        Make the plot of the SST on a map
+        Input:
+        m: projection from Basemap
+        figname: name of the figure (None by default, means to figure saved)
+        visfile: name of the file storing the visible scene (None by default)
+        """
+        fig = plt.figure(figsize=(8, 7))
+        ax = plt.subplot(111)
+
+        if swot is not None:
+            m.plot(swot.lon, swot.lat, "k--", ms=0.5, latlon=True,
+                   linewidth=0.5, alpha=0.7, zorder=7)
+
+        if visibleim is not None:
+            m.imshow(np.flipud(visibleim.array), zorder=4)
+                #m.pcolormesh(visibleim.lon, visibleim.lat, visibleim.array[:,:,0], latlon=True,
+                #             cmap=plt.cm.gray, zorder=1, alpha=0.7)
+        else:
+            m.fillcontinents(zorder=4)
+
+
+        pcm = m.pcolormesh(self.lon, self.lat, self.field, latlon=True,
+                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=6)
+        cb = plt.colorbar(pcm, orientation="horizontal", pad=0.05, extend="both", shrink=0.9)
+        cb.set_label("$^{\circ}$C")
+        m.drawcoastlines(linewidth=0.25)
+        #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
+        #               units='km', fontsize=10, fontcolor='k', zorder=5)
+        m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,1,0),
                         linewidth=.5, fontsize=12, zorder=3)
         m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
                         linewidth=.5, fontsize=12, zorder=3)
