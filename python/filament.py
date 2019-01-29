@@ -32,20 +32,25 @@ class SST(object):
         self.date = date
         self.fname = fname
 
-    def read_from_oceancolorL3(self, filename, coordinates):
+    def read_from_oceancolorL3(self, filename, coordinates=(-180., 180., -90., 90.)):
         """
         Read the coordinates and the SST from a L3 file
         and subset the domain defined by `coordinates`
+        If coordinates are not specified, then the whole domain
+        is considered
         """
         with netCDF4.Dataset(filename) as nc:
             self.fname = filename
             self.date = datetime.datetime.strptime(nc.time_coverage_end, "%Y-%m-%dT%H:%M:%S.000Z")
-            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
-            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            lon = nc.get_variables_by_attributes(long_name="Longitude")[0][:]
+            lat = nc.get_variables_by_attributes(long_name="Latitude")[0][:]
             goodlon = np.where( (lon >= coordinates[0] ) & (lon <= coordinates[1]))[0]
             goodlat = np.where( (lat >= coordinates[2] ) & (lat <= coordinates[3]))[0]
             self.field = nc.get_variables_by_attributes(standard_name="sea_surface_temperature")[0][goodlat, goodlon]
-            self.qflag = nc.get_variables_by_attributes(long_name="Quality Levels, Sea Surface Temperature")[0][goodlat, goodlon]
+            try:
+                self.qflag = nc.get_variables_by_attributes(long_name="Quality Levels, Sea Surface Temperature")[0][goodlat, goodlon]
+            except IndexError:
+                self.qflag = nc.variables["qual_sst4"][:]
         self.lon = lon[goodlon]
         self.lat = lat[goodlat]
 
