@@ -80,7 +80,7 @@ def make_monthly_subplot(lon, lat, SSTanom, month, NN=1):
 
 
 plt.close("all")
-fig = plt.figure(figsize=(13, 10))
+fig = plt.figure(figsize=(11.69,8.27))
 
 for imonth, monthlyfile in enumerate(monthfilelist):
     logger.debug("Working on file {}".format(monthlyfile))
@@ -106,14 +106,14 @@ for imonth, monthlyfile in enumerate(monthfilelist):
     ax = plt.subplot(3, 4, imonth+1)
     pcm = make_monthly_subplot(lonp, latp, SSTanom, imonth+1, NN=1)
 
-fig.subplots_adjust(right=0.85)
-cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.7])
+fig.subplots_adjust(right=0.9)
+cbar_ax = fig.add_axes([0.95, 0.15, 0.03, 0.7])
 normanom = mpl.colors.Normalize(vmin=-3., vmax=3.)
 cb1 = mpl.colorbar.ColorbarBase(cbar_ax, cmap=plt.cm.RdBu_r,
                             norm=normanom, orientation='vertical', extend="both")
 
 cb1.set_label("$^{\circ}$C", rotation=0, ha="left", fontsize=14)
 fig.suptitle('Sea surface temperature anomalies ({})'.format(year), fontsize=24)
-plt.savefig(os.path.join(figdir, "SSTanomalies{}05".format(year)), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(figdir, "SSTanomalies{}06".format(year)), dpi=300, bbox_inches="tight")
 # plt.show()
 plt.close()
