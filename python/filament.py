@@ -366,6 +366,129 @@ class Altimetry(object):
         self.sla = self.sla[goodlat, :]
         self.sla = self.sla[:, goodlon]
 
+def read_nao_esrl(filename, valex=-99.99):
+    """
+    ```
+    dates, noavalues = read_nao_esrl(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+    https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
+    """
+    with open(filename, "r") as f1:
+        ymin, ymax = f1.readline().rstrip().split()
+        yearmin = int(ymin)
+        yearmax = int(ymax)
+
+        # Create a date vector
+        datevec = []
+        for iyear, yy in enumerate(range(yearmin, yearmax+1)):
+            for mm in range(0, 12):
+                datevec.append(datetime.datetime(yy, mm+1, 1))
+
+        # Read the NAO values
+        naovalues = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            if len(lsplit) == 13:
+                year = lsplit[0]
+                naoyear = [float(nao) for nao in lsplit[1:]]
+                naovalues.extend(naoyear)
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+def read_nao_ucar(filename, valex=-999.):
+    """
+    ```
+    dates, noavalues = read_nao_ucar(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+
+    https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
+    """
+    with open(filename, "r") as f1:
+
+        # Read the NAO values
+        naovalues = []
+        yearvec = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            if len(lsplit) == 13:
+                yearvec.append(int(lsplit[0]))
+                naoyear = [float(nao) for nao in lsplit[1:]]
+                naovalues.extend(naoyear)
+
+    yearmin, yearmax = yearvec[0], yearvec[-1]
+
+    # Create a date vector
+    datevec = []
+    for iyear, yy in enumerate(range(yearmin, yearmax+1)):
+        for mm in range(0, 12):
+            datevec.append(datetime.datetime(yy, mm+1, 1))
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+
+def read_nao_noaa(filename, valex=-999.):
+    """
+    ```
+    dates, noavalues = read_nao_ucar(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+
+    https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii
+    """
+    with open(filename, "r") as f1:
+
+        # Read the NAO values
+        naovalues = []
+        datevec = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            year = int(lsplit[0])
+            month = int(lsplit[1])
+            nao = float(lsplit[2])
+
+            datevec.append(datetime.datetime(year, month, 1))
+            naovalues.append(nao)
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+def plot_nao_bars(datevec, naovalues, figname=None,
+                  xmin=datetime.datetime(2000, 1, 1),
+                  xmax=datetime.datetime(2018, 12, 31),
+                  **kwargs):
+    """
+    Create a bar chart of a NAO time series
+    """
+    plt.bar(datevec, naovalues, **kwargs)
+    plt.vlines(datetime.datetime(2010,1,1), -6., 6.,
+               linestyles='--')
+    plt.vlines(datetime.datetime(2011,1,1), -6., 6.,
+               linestyles='--')
+    plt.xlabel("Time")
+    plt.ylabel("NAO index", rotation=0, ha="right")
+    plt.xlim(xmin, xmax)
+    if figname is not None:
+        plt.savefig(figname, dpi=300, bbox_inches="tight")
+    plt.show()
+    plt.close()
+
+
 def prepare_3D_scat():
 
     fig = plt.figure(figsize=(12, 6))
