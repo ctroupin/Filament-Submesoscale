@@ -12,6 +12,10 @@ import cartopy.crs as ccrs
 from osgeo import gdal, osr
 import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logging.info("Starting")
+
 def get_filelist_url(year, dayofyear):
     """
     Generate a list of file URLs (OPEnDAP) for the netCDF corresponding to `year` and `dayofyear`
@@ -76,16 +80,45 @@ def read_data_domain(dataurl, domain):
 
     return lon2plot, lat2plot, uwind, vwind, speed
 
-def plot_wind_sat(lon, lat, u, v, speed, arr, extent, figname):
+def plot_wind_sat(lon, lat, u, v, speed, arr, extent, figname, cmap=plt.cm.hot_r, clim=[0, 15], date=None):
 
     myproj = ccrs.PlateCarree()
-    plt.figure(figsize=(8, 8))
+
+    fig = plt.figure(figsize=(8, 8))
+
     ax = plt.subplot(111, projection=myproj)
-    ax.quiver(lon, lat, u, v, speed, scale=400, width=.001, cmap=plt.cm.hot_r, clim=[5, 20])
+    if date is not None:
+        plt.text(0.15, 0.95, date, size=18, rotation=0.,
+                 ha="center", va="center",
+                 transform=ax.transAxes,
+                 bbox=dict(boxstyle="round",
+                           ec=(1., 0.5, 0.5),
+                           fc=(1., 1., 1.),
+                           alpha=.7
+                           )
+                 )
+    qv = ax.quiver(lon, lat, u, v, speed, scale=400, width=.001, cmap=cmap, clim=clim)
     ax.set_xlim(extent[0], extent[1])
     ax.set_ylim(extent[2], extent[3])
     ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
                    layers=['coastlines'])
     ax.imshow(arr, origin='upper', extent=extent, transform=myproj)
-    plt.savefig(figname, dpi=300, bbox_inches="tight")
-    plt.close()
+    cbar_ax = fig.add_axes([0.65, 0.32, 0.2, 0.015])
+    if clim[0] == 0.:
+        ext = "max"
+    else:
+        ext = "both"
+
+    cb = plt.colorbar(qv, orientation="horizontal", cax=cbar_ax, extend=ext)
+    cb.set_label("m/s (max. = {:.2f})".format(speed.max()), fontsize=12, color="w")
+    cb.ax.xaxis.set_tick_params(color="w")
+    cb.outline.set_edgecolor("w")
+    plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color="w")
+
+
+
+    try:
+        plt.savefig(figname, dpi=300, bbox_inches="tight")
+        plt.close()
+    except ValueError:
+        logger.warn("Problem with the figure")

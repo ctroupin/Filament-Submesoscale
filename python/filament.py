@@ -131,7 +131,8 @@ class SST(object):
         figname = figname.replace(".", "-")
         return figname
 
-    def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
+    def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None,
+                  vmin=16., vmax=24., shrink=1.):
         """
         Make the plot of the SST on a map
         Input:
@@ -154,20 +155,20 @@ class SST(object):
                 #m.pcolormesh(visibleim.lon, visibleim.lat, visibleim.array[:,:,0], latlon=True,
                 #             cmap=plt.cm.gray, zorder=1, alpha=0.7)
         else:
-            m.fillcontinents(zorder=4)
+            m.fillcontinents(zorder=5)
 
 
         pcm = m.pcolormesh(self.lon, self.lat, self.field, latlon=True,
-                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=6)
-        cb = plt.colorbar(pcm, extend="both", shrink=0.75)
+                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=3)
+        cb = plt.colorbar(pcm, extend="both", shrink=shrink)
         cb.set_label("$^{\circ}$C", rotation=0, ha="left")
         m.drawcoastlines(linewidth=0.25)
         #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
         #               units='km', fontsize=10, fontcolor='k', zorder=5)
         m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,0,1),
-                        linewidth=.5, fontsize=12, zorder=3)
+                        linewidth=.5, fontsize=12, zorder=4)
         m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
-                        linewidth=.5, fontsize=12, zorder=3)
+                        linewidth=.5, fontsize=12, zorder=4)
         if figname is not None:
             plt.savefig(figname, dpi=300, bbox_inches="tight")
         # plt.show()
@@ -212,6 +213,90 @@ class SST(object):
         # plt.show()
         plt.close()
 
+class Wind(object):
+    """
+    Wind field
+    """
+
+    def __init__(self, lon=None, lat=None, uwind=None, vwind=None, speed=None, date=None):
+        self.lon = lon
+        self.lat = lat
+        self.uwind = uwind
+        self.vwind = vwind
+        self.speed = speed
+        self.date = date
+
+    def read_from_ccmp(self, datafile, coordinates=None):
+
+        with netCDF4.Dataset(datafile, "r") as nc:
+            self.lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            self.lon[self.lon > 180.] -= 360.
+            time = nc.get_variables_by_attributes(standard_name="time")[0][:]
+            ntime = len(time)
+
+            if coordinates is not None:
+                goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
+                goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
+                self.lon = self.lon[goodlon]
+                self.lat = self.lat[goodlat]
+
+
+                if ntime == 12:
+                    # Climatology product
+                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
+                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
+                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
+                else:
+                    # Monthly product
+                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
+                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
+                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
+
+            else:
+                self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
+                self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
+                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
+
+
+    def read_from_scow(self, u_datafile, v_datafile, coordinates=None):
+        """
+        Read the wind field from the SCOW product
+        """
+        if os.path.exists(u_datafile):
+            with netCDF4.Dataset(u_datafile, "r") as nc:
+                self.lat = nc.variables["latitude"][:]
+                self.lon = nc.variables["longitude"][:]
+                self.lon[self.lon > 180.] -= 360.
+
+                if coordinates is not None:
+                    goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
+                    goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
+                    self.lon = self.lon[goodlon]
+                    self.lat = self.lat[goodlat]
+
+                self.uwind = np.empty((len(self.lat), len(self.lon), 12))
+                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
+                for i in range(0, 12):
+                    if coordinates is not None:
+                        self.uwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                    else:
+                        self.uwind[:,:,i] = windstress_vars[i][:, :]
+            self.uwind = np.ma.masked_where(self.uwind==-9999.0, self.uwind)
+
+
+        if os.path.exists(v_datafile):
+            with netCDF4.Dataset(v_datafile, "r") as nc:
+
+                self.vwind = np.empty((len(self.lat), len(self.lon), 12))
+                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
+                for i in range(0, 12):
+                    if coordinates is not None:
+                        self.vwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                    else:
+                        self.vwind[:,:,i] = windstress_vars[i][:, :]
+            self.vwind = np.ma.masked_where(self.vwind==-9999.0, self.vwind)
+
 class Swot(object):
     def __init__(self, lon=None, lat=None, rad=None):
         self.lon = lon
@@ -244,6 +329,17 @@ class Visible(object):
         self.lat = lat
         self.array = array
 
+    def list_from_dir(self, datadir, dd, satnames=["AQUA", "TERRA", "VIIRS"]):
+        """
+        Generate a list of geoTIFF files located in the directory `visdir`
+        """
+        fnames = []
+        for sat in satnames:
+            fname = "".join((sat, "_", dd.strftime("%Y-%m-%dT%H_%M_%SZ"), ".tiff"))
+            visname = os.path.join(datadir, fname)
+            if os.path.exists(visname):
+                fnames.append(visname)
+        return fnames
 
     def read_from(self, filename):
 
