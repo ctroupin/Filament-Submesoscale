@@ -24,15 +24,35 @@ class SST(object):
     """
 
     def __init__(self, lon=None, lat=None, field=None, qflag=None,
-                 year=None, dayofyear=None, date=None):
+                 date=None, fname=None):
         self.lon = lon
         self.lat = lat
         self.field = field
         self.qflag = qflag
-        self.timeunits = year
-        self.year = year
-        self.dayofyear = dayofyear
         self.date = date
+        self.fname = fname
+
+    def read_from_oceancolorL3(self, filename, coordinates=(-180., 180., -90., 90.)):
+        """
+        Read the coordinates and the SST from a L3 file
+        and subset the domain defined by `coordinates`
+        If coordinates are not specified, then the whole domain
+        is considered
+        """
+        with netCDF4.Dataset(filename) as nc:
+            self.fname = filename
+            self.date = datetime.datetime.strptime(nc.time_coverage_end, "%Y-%m-%dT%H:%M:%S.000Z")
+            lon = nc.get_variables_by_attributes(long_name="Longitude")[0][:]
+            lat = nc.get_variables_by_attributes(long_name="Latitude")[0][:]
+            goodlon = np.where( (lon >= coordinates[0] ) & (lon <= coordinates[1]))[0]
+            goodlat = np.where( (lat >= coordinates[2] ) & (lat <= coordinates[3]))[0]
+            self.field = nc.get_variables_by_attributes(standard_name="sea_surface_temperature")[0][goodlat, goodlon]
+            try:
+                self.qflag = nc.get_variables_by_attributes(long_name="Quality Levels, Sea Surface Temperature")[0][goodlat, goodlon]
+            except IndexError:
+                self.qflag = nc.variables["qual_sst4"][:]
+        self.lon = lon[goodlon]
+        self.lat = lat[goodlat]
 
     def read_from_oceancolorL2(self, filename):
         """
@@ -43,15 +63,16 @@ class SST(object):
         """
 
         if os.path.exists(filename):
+            self.fname = filename
             with netCDF4.Dataset(filename) as nc:
                 # Read platform
                 sat = nc.platform
                 # Read time information
                 # Assume all the measurements made the same day (and same year)
-                self.year = int(nc.groups['scan_line_attributes'].variables['year'][0])
-                self.dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
+                year = int(nc.groups['scan_line_attributes'].variables['year'][0])
+                dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
                 # Convert to date
-                self.date = datetime.datetime(self.year, 1, 1) + datetime.timedelta(self.dayofyear - 1)
+                self.date = datetime.datetime(year, 1, 1) + datetime.timedelta(dayofyear - 1)
                 # Read coordinates
                 self.lon = nc.groups['navigation_data'].variables['longitude'][:]
                 self.lat = nc.groups['navigation_data'].variables['latitude'][:]
@@ -63,36 +84,262 @@ class SST(object):
                     self.field = nc.groups['geophysical_data'].variables['sst4'][:]
                     self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
 
+    def read_from_ghrsst(self, filename):
+        """
+        Load the SST from netCDF GHRSST file obtained from
+        ftp://podaac-ftp.jpl.nasa.gov
+        :param filename: name of the netCDF file
+        :return: lon, lat, field, qflag, year, dayofyear
+        """
+        if os.path.exists(filename):
+            self.fname = filename
+            with netCDF4.Dataset(filename) as nc:
+                time = nc.variables["time"][0]
+                timeunits = nc.variables["time"].units
+                self.date = netCDF4.num2date(time, timeunits)
+                self.lon = nc.variables["lon"][:]
+                self.lat = nc.variables["lat"][:]
+                self.field = nc.variables["sea_surface_temperature"][0,:,:] - 273.15
+                self.qflag = nc.variables["quality_level"][0,:,:]
+
     def apply_qc(self, qf=1):
         """
         Mask the sst values which don't match the mentioned quality flag
         """
-        self.field = np.ma.masked_where(self.qflag != 1, self.field)
+        self.field = np.ma.masked_where(self.qflag > 1, self.field)
 
-    def get_title(self, filename):
+
+    def get_title(self):
         """
         Construct the title string based on the sensor, platform and date
         """
-        with netCDF4.Dataset(filename, "r") as nc:
-            titletext = "{} ({}), {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
-
+        with netCDF4.Dataset(self.fname, "r") as nc:
+            try:
+                titletext = "{} ({}) {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
+            except AttributeError:
+                titletext = "{} ({}) {}".format(nc.sensor, nc.platform, self.date.strftime("%Y-%m-%d"))
         return titletext
 
-    def get_figname(self, filename):
+    def get_figname(self):
         """
         Construct the figure name based on the sensor and the date
         """
-        with netCDF4.Dataset(filename, "r") as nc:
-            figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
-
+        # with netCDF4.Dataset(filename, "r") as nc:
+        #    figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
+        figname = os.path.basename(self.fname)
+        figname = os.path.splitext(figname)[0]
+        figname = figname.replace(".", "-")
         return figname
 
+    def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None,
+                  vmin=16., vmax=24., shrink=1.):
+        """
+        Make the plot of the SST on a map
+        Input:
+        m: projection from Basemap
+        figname: name of the figure (None by default, means to figure saved)
+        visfile: name of the file storing the visible scene (None by default)
+        """
+        fig = plt.figure(figsize=(8, 8))
+        ax = plt.subplot(111)
+        if titletext is None:
+            titletext = self.get_title()
+            plt.title(titletext, fontsize=18)
+
+        if swot is not None:
+            m.plot(swot.lon, swot.lat, "k--", ms=0.5, latlon=True,
+                   linewidth=0.5, alpha=0.7, zorder=7)
+
+        if visibleim is not None:
+            m.imshow(np.flipud(visibleim.array), zorder=4)
+                #m.pcolormesh(visibleim.lon, visibleim.lat, visibleim.array[:,:,0], latlon=True,
+                #             cmap=plt.cm.gray, zorder=1, alpha=0.7)
+        else:
+            m.fillcontinents(zorder=5)
+
+
+        pcm = m.pcolormesh(self.lon, self.lat, self.field, latlon=True,
+                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=3)
+        cb = plt.colorbar(pcm, extend="both", shrink=shrink)
+        cb.set_label("$^{\circ}$C", rotation=0, ha="left")
+        m.drawcoastlines(linewidth=0.25)
+        #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
+        #               units='km', fontsize=10, fontcolor='k', zorder=5)
+        m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,0,1),
+                        linewidth=.5, fontsize=12, zorder=4)
+        m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
+                        linewidth=.5, fontsize=12, zorder=4)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
+    def make_plot2(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
+        """
+        Make the plot of the SST on a map
+        Input:
+        m: projection from Basemap
+        figname: name of the figure (None by default, means to figure saved)
+        visfile: name of the file storing the visible scene (None by default)
+        """
+        fig = plt.figure(figsize=(8, 7))
+        ax = plt.subplot(111)
+
+        if swot is not None:
+            m.plot(swot.lon, swot.lat, "k--", ms=0.5, latlon=True,
+                   linewidth=0.5, alpha=0.7, zorder=7)
+
+        if visibleim is not None:
+            m.imshow(np.flipud(visibleim.array), zorder=4)
+                #m.pcolormesh(visibleim.lon, visibleim.lat, visibleim.array[:,:,0], latlon=True,
+                #             cmap=plt.cm.gray, zorder=1, alpha=0.7)
+        else:
+            m.fillcontinents(zorder=4)
+
+
+        pcm = m.pcolormesh(self.lon, self.lat, self.field, latlon=True,
+                          cmap=cmocean.cm.thermal, vmin=vmin, vmax=vmax, zorder=6)
+        cb = plt.colorbar(pcm, orientation="horizontal", pad=0.05, extend="both", shrink=0.9)
+        cb.set_label("$^{\circ}$C")
+        m.drawcoastlines(linewidth=0.25)
+        #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
+        #               units='km', fontsize=10, fontcolor='k', zorder=5)
+        m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,1,0),
+                        linewidth=.5, fontsize=12, zorder=3)
+        m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
+                        linewidth=.5, fontsize=12, zorder=3)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
+class Wind(object):
+    """
+    Wind field
+    """
+
+    def __init__(self, lon=None, lat=None, uwind=None, vwind=None, speed=None, date=None):
+        self.lon = lon
+        self.lat = lat
+        self.uwind = uwind
+        self.vwind = vwind
+        self.speed = speed
+        self.date = date
+
+    def read_from_ccmp(self, datafile, coordinates=None):
+
+        with netCDF4.Dataset(datafile, "r") as nc:
+            self.lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            self.lon[self.lon > 180.] -= 360.
+            time = nc.get_variables_by_attributes(standard_name="time")[0][:]
+            ntime = len(time)
+
+            if coordinates is not None:
+                goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
+                goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
+                self.lon = self.lon[goodlon]
+                self.lat = self.lat[goodlat]
+
+
+                if ntime == 12:
+                    # Climatology product
+                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
+                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
+                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
+                else:
+                    # Monthly product
+                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
+                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
+                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
+
+            else:
+                self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
+                self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
+                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
+
+
+    def read_from_scow(self, u_datafile, v_datafile, coordinates=None):
+        """
+        Read the wind field from the SCOW product
+        """
+        if os.path.exists(u_datafile):
+            with netCDF4.Dataset(u_datafile, "r") as nc:
+                self.lat = nc.variables["latitude"][:]
+                self.lon = nc.variables["longitude"][:]
+                self.lon[self.lon > 180.] -= 360.
+
+                if coordinates is not None:
+                    goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
+                    goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
+                    self.lon = self.lon[goodlon]
+                    self.lat = self.lat[goodlat]
+
+                self.uwind = np.empty((len(self.lat), len(self.lon), 12))
+                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
+                for i in range(0, 12):
+                    if coordinates is not None:
+                        self.uwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                    else:
+                        self.uwind[:,:,i] = windstress_vars[i][:, :]
+            self.uwind = np.ma.masked_where(self.uwind==-9999.0, self.uwind)
+
+
+        if os.path.exists(v_datafile):
+            with netCDF4.Dataset(v_datafile, "r") as nc:
+
+                self.vwind = np.empty((len(self.lat), len(self.lon), 12))
+                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
+                for i in range(0, 12):
+                    if coordinates is not None:
+                        self.vwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                    else:
+                        self.vwind[:,:,i] = windstress_vars[i][:, :]
+            self.vwind = np.ma.masked_where(self.vwind==-9999.0, self.vwind)
+
+class Swot(object):
+    def __init__(self, lon=None, lat=None, rad=None):
+        self.lon = lon
+        self.lat = lat
+        self.rad = rad
+
+    def read_from(self, orbitfile):
+        """
+        Read the orbit from a text file
+        """
+        if os.path.exists(orbitfile):
+            self.lon, self.lat, self.rad = np.loadtxt(orbitfile, comments="#", unpack=True)
+            self.lon[self.lon>180.] = self.lon[self.lon>180.] - 360.
+
+    def select_domain(self, coordinates):
+        goodlon = np.where(np.logical_and(self.lon>= coordinates[0], self.lon<= coordinates[1]))[0]
+        goodlat = np.where(np.logical_and(self.lat>= coordinates[2], self.lat<= coordinates[3]))[0]
+        goodcoords = np.intersect1d(goodlon, goodlat)
+        self.lon = self.lon[goodcoords]
+        self.lat = self.lat[goodcoords]
+
+    def add_to_plot(self, m):
+        m.plot(swot.lon, swot.lat, "ko--", ms=0.5, latlon=True)
+
+
 class Visible(object):
+
     def __init__(self, lon=None, lat=None, array=None):
         self.lon = lon
         self.lat = lat
         self.array = array
 
+    def list_from_dir(self, datadir, dd, satnames=["AQUA", "TERRA", "VIIRS"]):
+        """
+        Generate a list of geoTIFF files located in the directory `visdir`
+        """
+        fnames = []
+        for sat in satnames:
+            fname = "".join((sat, "_", dd.strftime("%Y-%m-%dT%H_%M_%SZ"), ".tiff"))
+            visname = os.path.join(datadir, fname)
+            if os.path.exists(visname):
+                fnames.append(visname)
+        return fnames
 
     def read_from(self, filename):
 
@@ -112,6 +359,20 @@ class Visible(object):
 
         self.lon = trans[1] * xx + trans[2] * yy + trans[0]
         self.lat = trans[4] * xx + trans[5] * yy + trans[3]
+
+    def extract_area(self, coordinates):
+        """
+        Extract the visible image in the region of interest
+        """
+        lonvis = self.lon[0,:]
+        latvis = self.lat[:,0]
+        goodlon = np.where(np.logical_and(lonvis <= coordinates[1], lonvis >= coordinates[0]))[0]
+        goodlat = np.where(np.logical_and(latvis <= coordinates[3], latvis >= coordinates[2]))[0]
+        self.array = self.array[goodlat, :, :]
+        self.array = self.array[:, goodlon, :]
+        self.lon = self.lon[:,goodlon]
+        self.lat = self.lat[goodlat,:]
+
 
 class Altimetry(object):
 
@@ -200,6 +461,129 @@ class Altimetry(object):
         self.v = self.v[:, goodlon]
         self.sla = self.sla[goodlat, :]
         self.sla = self.sla[:, goodlon]
+
+def read_nao_esrl(filename, valex=-99.99):
+    """
+    ```
+    dates, noavalues = read_nao_esrl(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+    https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
+    """
+    with open(filename, "r") as f1:
+        ymin, ymax = f1.readline().rstrip().split()
+        yearmin = int(ymin)
+        yearmax = int(ymax)
+
+        # Create a date vector
+        datevec = []
+        for iyear, yy in enumerate(range(yearmin, yearmax+1)):
+            for mm in range(0, 12):
+                datevec.append(datetime.datetime(yy, mm+1, 1))
+
+        # Read the NAO values
+        naovalues = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            if len(lsplit) == 13:
+                year = lsplit[0]
+                naoyear = [float(nao) for nao in lsplit[1:]]
+                naovalues.extend(naoyear)
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+def read_nao_ucar(filename, valex=-999.):
+    """
+    ```
+    dates, noavalues = read_nao_ucar(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+
+    https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
+    """
+    with open(filename, "r") as f1:
+
+        # Read the NAO values
+        naovalues = []
+        yearvec = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            if len(lsplit) == 13:
+                yearvec.append(int(lsplit[0]))
+                naoyear = [float(nao) for nao in lsplit[1:]]
+                naovalues.extend(naoyear)
+
+    yearmin, yearmax = yearvec[0], yearvec[-1]
+
+    # Create a date vector
+    datevec = []
+    for iyear, yy in enumerate(range(yearmin, yearmax+1)):
+        for mm in range(0, 12):
+            datevec.append(datetime.datetime(yy, mm+1, 1))
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+
+def read_nao_noaa(filename, valex=-999.):
+    """
+    ```
+    dates, noavalues = read_nao_ucar(filename):
+    ```
+    Read the NAO monthly time series from the file obtained from
+
+    https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii
+    """
+    with open(filename, "r") as f1:
+
+        # Read the NAO values
+        naovalues = []
+        datevec = []
+        for lines in f1:
+            lsplit = lines.rstrip().split()
+            year = int(lsplit[0])
+            month = int(lsplit[1])
+            nao = float(lsplit[2])
+
+            datevec.append(datetime.datetime(year, month, 1))
+            naovalues.append(nao)
+
+    # Replace fill value by NaN
+    datevec = np.array(datevec)
+    naovalues = np.array(naovalues)
+    naovalues[naovalues == valex] = np.nan
+
+    return datevec, naovalues
+
+def plot_nao_bars(datevec, naovalues, figname=None,
+                  xmin=datetime.datetime(2000, 1, 1),
+                  xmax=datetime.datetime(2018, 12, 31),
+                  **kwargs):
+    """
+    Create a bar chart of a NAO time series
+    """
+    plt.bar(datevec, naovalues, **kwargs)
+    plt.vlines(datetime.datetime(2010,1,1), -6., 6.,
+               linestyles='--')
+    plt.vlines(datetime.datetime(2011,1,1), -6., 6.,
+               linestyles='--')
+    plt.xlabel("Time")
+    plt.ylabel("NAO index", rotation=0, ha="right")
+    plt.xlim(xmin, xmax)
+    if figname is not None:
+        plt.savefig(figname, dpi=300, bbox_inches="tight")
+    plt.show()
+    plt.close()
+
 
 def prepare_3D_scat():
 
