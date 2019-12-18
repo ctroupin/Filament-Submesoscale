@@ -1,7 +1,6 @@
 # Filament-Submesoscale
 Python tools to read and process oceanographic data related to upwelling filaments
 
-
 ## Data sources
 
 ### NAO
@@ -15,8 +14,7 @@ https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
 https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
 [downloaded July 5, 2019]
 
-
-North Atlantic SST Anomalies and the Cold North European Weather Events of Winter 2009/10 and December 2010 
+North Atlantic SST Anomalies and the Cold North European Weather Events of Winter 2009/10 and December 2010
 https://journals.ametsoc.org/doi/full/10.1175/MWR-D-13-00104.1
 
 Understanding the contrasting North Atlantic Oscillation anomalies of the winters of 2010 and 2014
@@ -31,7 +29,6 @@ NOAA Optimum Interpolation (OI) Sea Surface Temperature (SST) V2
 https://www.esrl.noaa.gov/psd/data/gridded/data.noaa.oisst.v2.html
 
 ### Chlorophyll concentration
-
 
 https://oceandata.sci.gsfc.nasa.gov/MODIS-Terra/Mapped/Monthly/9km/
 
