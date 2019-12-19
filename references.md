@@ -1,5 +1,9 @@
 ## Useful references
 
-### Upwelling [filaments](./References/filaments.md)
+[Submesoscale](./References/submesoscale.md) processes ([BibTeX](./References/submesoscale.bib) file)
 
-### North Atlantic Oscillation [NAO](./References/nao.md)
+Upwelling [filaments](./References/filaments.md)
+
+Eastern boundary current upwelling systems ([EBUS](./References/ebus.md))
+
+North Atlantic Oscillation ([NAO](./References/nao.md))
