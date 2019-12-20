@@ -43,11 +43,26 @@ def get_filelist_url(year, dayofyear):
 
 def read_data_domain(dataurl, domain):
     """
+    ```python
+    lon, lat, u, v, s,  = read_data_domain(dataurl, domain)
+
+    Read the coordinates, the wind speed and components from the file stored
+    in `dataurl` (OPEnDAP) and subset it on the `domain`.
+
+    Inputs:
+    dataurl: OPEnDAP URL
+    domain: 4-element array storing the domain extension
+
+    Outputs:
+    lon, lat: coordinates (arrays)
+    u, v: velocity components (arrays)
+    res: boolean, True if data are found in the domain
+    ```
     Read the wind data from the file is measurements are available in the domain
     Otherwise return None
     """
 
-    lon2plot, lat2plot, uwind, vwind, speed = None, None, None, None, None
+    lon2plot, lat2plot, uwind, vwind, speed, res = None, None, None, None, None, False
 
     try:
         # Read the coordinates
@@ -73,15 +88,35 @@ def read_data_domain(dataurl, domain):
 
             uwind = speed * np.sin(np.deg2rad(winddir2plot))
             vwind = speed * np.cos(np.deg2rad(winddir2plot))
+            res = True
         else:
             logger.info("No data in the region of interest")
+            res = False
     except OSError:
         logger.warning("Problem to access the file")
 
-    return lon2plot, lat2plot, uwind, vwind, speed
+    return lon2plot, lat2plot, uwind, vwind, speed, res
 
-def plot_wind_sat(lon, lat, u, v, speed, arr, extent, figname, cmap=plt.cm.hot_r, clim=[0, 15], date=None):
+def plot_wind_sat(lon, lat, u, v, speed, extent, figname=None, arr=None, cmap=plt.cm.hot_r, clim=[0, 15], date=None):
+    """
+    ```python
+    plot_wind_sat(lon, lat, u, v, speed, extent, figname, arr, cmap, clim, date)
+    ```
+    Display the wind field defined by (u, v) on coordinates (lon, lat) as a
+    quiver plot.
 
+    Parameters:
+    lon, lat: coordinates (arrays)
+    u, v: velocity components (arrays)
+    speed: wind intensity (array)
+    extent: 4-element array storing the domain extension
+            (lonmin, lonmax, latmin, latmax)
+    figname: path of the figure to be saved
+    arr: M x N x 3 array storing a visible image read from a geoTIFF
+    cmap: the colormap
+    clim: limits of the colorbar
+    date: the date to be added to the plot
+    """
     myproj = ccrs.PlateCarree()
 
     fig = plt.figure(figsize=(8, 8))
@@ -102,7 +137,12 @@ def plot_wind_sat(lon, lat, u, v, speed, arr, extent, figname, cmap=plt.cm.hot_r
     ax.set_ylim(extent[2], extent[3])
     ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
                    layers=['coastlines'])
-    ax.imshow(arr, origin='upper', extent=extent, transform=myproj)
+
+    if arr is not None:
+        ax.imshow(arr, origin='upper', extent=extent, transform=myproj)
+    else:
+        logger.debug("No visible image for the plot")
+
     cbar_ax = fig.add_axes([0.65, 0.32, 0.2, 0.015])
     if clim[0] == 0.:
         ext = "max"
@@ -115,10 +155,9 @@ def plot_wind_sat(lon, lat, u, v, speed, arr, extent, figname, cmap=plt.cm.hot_r
     cb.outline.set_edgecolor("w")
     plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color="w")
 
-
-
-    try:
-        plt.savefig(figname, dpi=300, bbox_inches="tight")
-        plt.close()
-    except ValueError:
-        logger.warn("Problem with the figure")
+    if figname is not None:
+        try:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+            plt.close()
+        except ValueError:
+            logger.warn("Problem with the figure")
