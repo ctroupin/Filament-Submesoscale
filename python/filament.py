@@ -16,6 +16,8 @@ import cmocean
 import scipy.io as sio
 import warnings
 import matplotlib.cbook
+from matplotlib import colors
+
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
 class SST(object):
@@ -32,7 +34,7 @@ class SST(object):
         self.date = date
         self.fname = fname
 
-    def read_from_oceancolorL3(self, filename, coordinates=(-180., 180., -90., 90.)):
+    def read_from_oceancolorL3(self, filename, domain=(-180., 180., -90., 90.)):
         """
         Read the coordinates and the SST from a L3 file
         and subset the domain defined by `coordinates`
@@ -44,8 +46,8 @@ class SST(object):
             self.date = datetime.datetime.strptime(nc.time_coverage_end, "%Y-%m-%dT%H:%M:%S.000Z")
             lon = nc.get_variables_by_attributes(long_name="Longitude")[0][:]
             lat = nc.get_variables_by_attributes(long_name="Latitude")[0][:]
-            goodlon = np.where( (lon >= coordinates[0] ) & (lon <= coordinates[1]))[0]
-            goodlat = np.where( (lat >= coordinates[2] ) & (lat <= coordinates[3]))[0]
+            goodlon = np.where( (lon >= domain[0] ) & (lon <= domain[1]))[0]
+            goodlat = np.where( (lat >= domain[2] ) & (lat <= domain[3]))[0]
             self.field = nc.get_variables_by_attributes(standard_name="sea_surface_temperature")[0][goodlat, goodlon]
             try:
                 self.qflag = nc.get_variables_by_attributes(long_name="Quality Levels, Sea Surface Temperature")[0][goodlat, goodlon]
@@ -174,6 +176,37 @@ class SST(object):
         # plt.show()
         plt.close()
 
+    def make_plot_qf(self, m, figname=None, titletext=None, shrink=1.):
+        fig = plt.figure(figsize=(8, 8))
+        ax = plt.subplot(111)
+
+        if titletext is None:
+            titletext = self.get_title()
+            plt.title(titletext, fontsize=18)
+
+        m.fillcontinents(zorder=5)
+
+        cmap = plt.cm.YlOrRd
+        norm = colors.BoundaryNorm(np.arange(-0.5, 4.5001, 1), cmap.N)
+
+        pcm = m.pcolormesh(self.lon, self.lat, self.qflag, cmap=cmap,
+                           vmin=-0.5, vmax=4.5, norm=norm, zorder=3)
+        cb = plt.colorbar(pcm, ticks=[0, 1, 2, 3, 4], shrink=shrink)
+        cb.set_ticklabels(["Best", "Good", "Questionable", "Bad", "Not processed"])
+
+        m.drawcoastlines(linewidth=0.25)
+        #m.drawmapscale(-10., 27.25, -10., 27.25, 100, barstyle='simple',
+        #               units='km', fontsize=10, fontcolor='k', zorder=5)
+        m.drawmeridians(np.arange(m.lonmin, m.lonmax, 3.), labels=(0,0,0,1),
+                        linewidth=.5, fontsize=12, zorder=4)
+        m.drawparallels(np.arange(m.latmin, m.latmax, 2.), labels=(1,0,0,0),
+                        linewidth=.5, fontsize=12, zorder=4)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
+
     def make_plot2(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
         """
         Make the plot of the SST on a map
@@ -213,89 +246,6 @@ class SST(object):
         # plt.show()
         plt.close()
 
-class Wind(object):
-    """
-    Wind field
-    """
-
-    def __init__(self, lon=None, lat=None, uwind=None, vwind=None, speed=None, date=None):
-        self.lon = lon
-        self.lat = lat
-        self.uwind = uwind
-        self.vwind = vwind
-        self.speed = speed
-        self.date = date
-
-    def read_from_ccmp(self, datafile, coordinates=None):
-
-        with netCDF4.Dataset(datafile, "r") as nc:
-            self.lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
-            self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
-            self.lon[self.lon > 180.] -= 360.
-            time = nc.get_variables_by_attributes(standard_name="time")[0][:]
-            ntime = len(time)
-
-            if coordinates is not None:
-                goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
-                goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
-                self.lon = self.lon[goodlon]
-                self.lat = self.lat[goodlat]
-
-
-                if ntime == 12:
-                    # Climatology product
-                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
-                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
-                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
-                else:
-                    # Monthly product
-                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
-                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
-                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
-
-            else:
-                self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
-                self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
-                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
-
-
-    def read_from_scow(self, u_datafile, v_datafile, coordinates=None):
-        """
-        Read the wind field from the SCOW product
-        """
-        if os.path.exists(u_datafile):
-            with netCDF4.Dataset(u_datafile, "r") as nc:
-                self.lat = nc.variables["latitude"][:]
-                self.lon = nc.variables["longitude"][:]
-                self.lon[self.lon > 180.] -= 360.
-
-                if coordinates is not None:
-                    goodlon = np.where( (self.lon<= coordinates[1]) & (self.lon>= coordinates[0]))[0]
-                    goodlat = np.where( (self.lat<= coordinates[3]) & (self.lat>= coordinates[2]))[0]
-                    self.lon = self.lon[goodlon]
-                    self.lat = self.lat[goodlat]
-
-                self.uwind = np.empty((len(self.lat), len(self.lon), 12))
-                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
-                for i in range(0, 12):
-                    if coordinates is not None:
-                        self.uwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
-                    else:
-                        self.uwind[:,:,i] = windstress_vars[i][:, :]
-            self.uwind = np.ma.masked_where(self.uwind==-9999.0, self.uwind)
-
-
-        if os.path.exists(v_datafile):
-            with netCDF4.Dataset(v_datafile, "r") as nc:
-
-                self.vwind = np.empty((len(self.lat), len(self.lon), 12))
-                windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
-                for i in range(0, 12):
-                    if coordinates is not None:
-                        self.vwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
-                    else:
-                        self.vwind[:,:,i] = windstress_vars[i][:, :]
-            self.vwind = np.ma.masked_where(self.vwind==-9999.0, self.vwind)
 
 class Swot(object):
     def __init__(self, lon=None, lat=None, rad=None):
@@ -360,14 +310,18 @@ class Visible(object):
         self.lon = trans[1] * xx + trans[2] * yy + trans[0]
         self.lat = trans[4] * xx + trans[5] * yy + trans[3]
 
-    def extract_area(self, coordinates):
+    def extract_area(self, domain):
         """
-        Extract the visible image in the region of interest
+        ```python
+        extract_area(coordinates)
+        ```
+        Extract the coordinates and the field in the region of interest
+        :param domain: a 4-element iterable specifying the region of interest
         """
         lonvis = self.lon[0,:]
         latvis = self.lat[:,0]
-        goodlon = np.where(np.logical_and(lonvis <= coordinates[1], lonvis >= coordinates[0]))[0]
-        goodlat = np.where(np.logical_and(latvis <= coordinates[3], latvis >= coordinates[2]))[0]
+        goodlon = np.where(np.logical_and(lonvis <= domain[1], lonvis >= domain[0]))[0]
+        goodlat = np.where(np.logical_and(latvis <= domain[3], latvis >= domain[2]))[0]
         self.array = self.array[goodlat, :, :]
         self.array = self.array[:, goodlon, :]
         self.lon = self.lon[:,goodlon]
@@ -392,7 +346,9 @@ class Altimetry(object):
 
     def read_from_aviso(self, filename):
         """
-
+        ```python
+        read_from_aviso(filename)
+        ```
         :param filename: name of the netCDF file
         :return: lon, lat, SLA, u, v, time
         """
@@ -462,18 +418,73 @@ class Altimetry(object):
         self.sla = self.sla[goodlat, :]
         self.sla = self.sla[:, goodlon]
 
-def read_nao_esrl(filename, valex=-99.99):
-    """
-    ```
-    dates, noavalues = read_nao_esrl(filename):
-    ```
-    Read the NAO monthly time series from the file obtained from
-    https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
-    """
-    with open(filename, "r") as f1:
-        ymin, ymax = f1.readline().rstrip().split()
-        yearmin = int(ymin)
-        yearmax = int(ymax)
+class NAO(object):
+
+    def __init__(self, values=None, times=None):
+        if len(values) == len(times):
+            self.values = values
+            self.times = times
+        else:
+            logger.error("Values and times have not the same dimension")
+
+
+    def read_from_esrl(self, filename, valex=-999.99):
+        """
+        ```python
+        read_nao_esrl(filename, valex):
+        ```
+        Read the NAO monthly time series from the file obtained from
+        https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
+        :param filename: path to the file containing the data
+        """
+        with open(filename, "r") as f1:
+            ymin, ymax = f1.readline().rstrip().split()
+            yearmin = int(ymin)
+            yearmax = int(ymax)
+
+            # Create a date vector
+            datevec = []
+            for iyear, yy in enumerate(range(yearmin, yearmax+1)):
+                for mm in range(0, 12):
+                    datevec.append(datetime.datetime(yy, mm+1, 1))
+
+            # Read the NAO values
+            naovalues = []
+            for lines in f1:
+                lsplit = lines.rstrip().split()
+                if len(lsplit) == 13:
+                    year = lsplit[0]
+                    naoyear = [float(nao) for nao in lsplit[1:]]
+                    naovalues.extend(naoyear)
+
+        # Replace fill value by NaN
+        self.times = np.array(datevec)
+        naovalues = np.array(naovalues)
+        naovalues[naovalues == valex] = np.nan
+        self.values = naovalues
+
+    def read_nao_ucar(self, filename, valex=-999.99):
+        """
+        ```python
+        read_nao_ucar(filename, valex):
+        ```
+        Read the NAO monthly time series from the file obtained from
+
+        https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
+        """
+        with open(filename, "r") as f1:
+
+            # Read the NAO values
+            naovalues = []
+            yearvec = []
+            for lines in f1:
+                lsplit = lines.rstrip().split()
+                if len(lsplit) == 13:
+                    yearvec.append(int(lsplit[0]))
+                    naoyear = [float(nao) for nao in lsplit[1:]]
+                    naovalues.extend(naoyear)
+
+        yearmin, yearmax = yearvec[0], yearvec[-1]
 
         # Create a date vector
         datevec = []
@@ -481,108 +492,58 @@ def read_nao_esrl(filename, valex=-99.99):
             for mm in range(0, 12):
                 datevec.append(datetime.datetime(yy, mm+1, 1))
 
-        # Read the NAO values
-        naovalues = []
-        for lines in f1:
-            lsplit = lines.rstrip().split()
-            if len(lsplit) == 13:
-                year = lsplit[0]
-                naoyear = [float(nao) for nao in lsplit[1:]]
-                naovalues.extend(naoyear)
+        # Replace fill value by NaN
+        self.times = np.array(datevec)
+        self.values = np.array(naovalues)
+        self.values[self.values == valex] = np.nan
 
-    # Replace fill value by NaN
-    datevec = np.array(datevec)
-    naovalues = np.array(naovalues)
-    naovalues[naovalues == valex] = np.nan
+    def read_nao_noaa(self, filename, valex=-999.99):
+        """
+        ```python
+        dates, noavalues = read_nao_ucar(filename):
+        ```
+        Read the NAO monthly time series from the file obtained from
 
-    return datevec, naovalues
+        https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii
+        """
+        with open(filename, "r") as f1:
 
-def read_nao_ucar(filename, valex=-999.):
-    """
-    ```
-    dates, noavalues = read_nao_ucar(filename):
-    ```
-    Read the NAO monthly time series from the file obtained from
+            # Read the NAO values
+            naovalues = []
+            datevec = []
+            for lines in f1:
+                lsplit = lines.rstrip().split()
+                year = int(lsplit[0])
+                month = int(lsplit[1])
+                nao = float(lsplit[2])
 
-    https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
-    """
-    with open(filename, "r") as f1:
+                datevec.append(datetime.datetime(year, month, 1))
+                naovalues.append(nao)
 
-        # Read the NAO values
-        naovalues = []
-        yearvec = []
-        for lines in f1:
-            lsplit = lines.rstrip().split()
-            if len(lsplit) == 13:
-                yearvec.append(int(lsplit[0]))
-                naoyear = [float(nao) for nao in lsplit[1:]]
-                naovalues.extend(naoyear)
+        # Replace fill value by NaN
+        self.times = np.array(datevec)
+        self.values = np.array(naovalues)
+        self.values[self.values == valex] = np.nan
 
-    yearmin, yearmax = yearvec[0], yearvec[-1]
-
-    # Create a date vector
-    datevec = []
-    for iyear, yy in enumerate(range(yearmin, yearmax+1)):
-        for mm in range(0, 12):
-            datevec.append(datetime.datetime(yy, mm+1, 1))
-
-    # Replace fill value by NaN
-    datevec = np.array(datevec)
-    naovalues = np.array(naovalues)
-    naovalues[naovalues == valex] = np.nan
-
-    return datevec, naovalues
-
-
-def read_nao_noaa(filename, valex=-999.):
-    """
-    ```
-    dates, noavalues = read_nao_ucar(filename):
-    ```
-    Read the NAO monthly time series from the file obtained from
-
-    https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii
-    """
-    with open(filename, "r") as f1:
-
-        # Read the NAO values
-        naovalues = []
-        datevec = []
-        for lines in f1:
-            lsplit = lines.rstrip().split()
-            year = int(lsplit[0])
-            month = int(lsplit[1])
-            nao = float(lsplit[2])
-
-            datevec.append(datetime.datetime(year, month, 1))
-            naovalues.append(nao)
-
-    # Replace fill value by NaN
-    datevec = np.array(datevec)
-    naovalues = np.array(naovalues)
-    naovalues[naovalues == valex] = np.nan
-
-    return datevec, naovalues
-
-def plot_nao_bars(datevec, naovalues, figname=None,
-                  xmin=datetime.datetime(2000, 1, 1),
-                  xmax=datetime.datetime(2018, 12, 31),
-                  **kwargs):
-    """
-    Create a bar chart of a NAO time series
-    """
-    plt.bar(datevec, naovalues, **kwargs)
-    plt.vlines(datetime.datetime(2010,1,1), -6., 6.,
-               linestyles='--')
-    plt.vlines(datetime.datetime(2011,1,1), -6., 6.,
-               linestyles='--')
-    plt.xlabel("Time")
-    plt.ylabel("NAO index", rotation=0, ha="right")
-    plt.xlim(xmin, xmax)
-    if figname is not None:
-        plt.savefig(figname, dpi=300, bbox_inches="tight")
-    plt.show()
-    plt.close()
+    def plot_nao_bars(datevec, naovalues, figname=None,
+                      xmin=datetime.datetime(2000, 1, 1),
+                      xmax=datetime.datetime(2018, 12, 31),
+                      **kwargs):
+        """
+        Create a bar chart of a NAO time series
+        """
+        plt.bar(datevec, naovalues, **kwargs)
+        plt.vlines(datetime.datetime(2010,1,1), -6., 6.,
+                   linestyles='--')
+        plt.vlines(datetime.datetime(2011,1,1), -6., 6.,
+                   linestyles='--')
+        plt.xlabel("Time")
+        plt.ylabel("NAO index", rotation=0, ha="right")
+        plt.xlim(xmin, xmax)
+        if figname is not None:
+            plt.savefig(figname, dpi=300, bbox_inches="tight")
+        plt.show()
+        plt.close()
 
 
 def prepare_3D_scat():
