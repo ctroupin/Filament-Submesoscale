@@ -41,6 +41,8 @@ def get_filelist_url(year, dayofyear):
 
     return urllist
 
+
+
 def read_data_domain(dataurl, domain):
     """
     ```python
@@ -97,7 +99,8 @@ def read_data_domain(dataurl, domain):
 
     return lon2plot, lat2plot, uwind, vwind, speed, res
 
-def plot_wind_sat(lon, lat, u, v, speed, extent, figname=None, arr=None, cmap=plt.cm.hot_r, clim=[0, 15], date=None):
+def plot_wind_sat(lon, lat, u, v, speed, extent, figname=None, arr=None,
+                  cmap=plt.cm.hot_r, clim=[0, 15], date=None):
     """
     ```python
     plot_wind_sat(lon, lat, u, v, speed, extent, figname, arr, cmap, clim, date)
