@@ -18,6 +18,8 @@ import warnings
 import matplotlib.cbook
 from matplotlib import colors
 
+logger = logging.getLogger("Filament")
+
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
 class SST(object):
@@ -306,18 +308,18 @@ class Wind(object):
 
                 if ntime == 12:
                     # Climatology product
-                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
-                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
+                    self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
+                    self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
                     self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
                 else:
                     # Monthly product
-                    self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
-                    self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
+                    self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
+                    self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
                     self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
 
             else:
-                self.uwind = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
-                self.vwind = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
+                self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
+                self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
                 self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
 
 
@@ -469,49 +471,73 @@ class Wind(object):
         cb.outline.set_edgecolor(textcolor)
         plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
 
-
 class Visible(object):
 
-    def __init__(self, lon=None, lat=None, array=None):
+    def __init__(self, lon=None, lat=None, proj=None, extent=None, image=None):
         self.lon = lon
         self.lat = lat
-        self.array = array
+        self.proj = proj
+        self.image = image
+        self.extent = extent
 
-    def list_from_dir(self, datadir, dd, satnames=["AQUA", "TERRA", "VIIRS"]):
+    def read_geotiff(self, imagefile):
         """
-        Generate a list of geoTIFF files located in the directory `visdir`
+        ```python
+        read_geotiff(imagefile)
+        ```
+        Read an image and compute the coordinates from a geoTIFF file.
+
+        Input: imagefile
+        -----
         """
-        fnames = []
-        for sat in satnames:
-            fname = "".join((sat, "_", dd.strftime("%Y-%m-%dT%H_%M_%SZ"), ".tiff"))
-            visname = os.path.join(datadir, fname)
-            if os.path.exists(visname):
-                fnames.append(visname)
-        return fnames
+        ds = gdal.Open(imagefile, gdal.GA_ReadOnly)
 
-    def read_from(self, filename):
+        # Read the array and the transformation
+        arr = ds.ReadAsArray()
+        # Read the geo transform
+        trans = ds.GetGeoTransform()
+        # Compute the spatial extent
+        self.extent = [trans[0], trans[0] + ds.RasterXSize*trans[1],
+                      trans[3] + ds.RasterYSize*trans[5], trans[3]]
 
-        gtif = gdal.Open(filename)
+        # Get the info on the projection
+        proj = ds.GetProjection()
+        inproj = osr.SpatialReference()
+        inproj.ImportFromWkt(proj)
+        self.proj = inproj
 
-        # info about the projection
-        arr = gtif.ReadAsArray()
-        trans = gtif.GetGeoTransform()
-        self.extent = (trans[0], trans[0] + gtif.RasterXSize*trans[1],
-                  trans[3] + gtif.RasterYSize*trans[5], trans[3])
-        # Permute dimensions
-        self.array = np.transpose(arr, (1, 2, 0))
+        # Compute the coordinates
+        x = np.arange(0, ds.RasterXSize)
+        y = np.arange(0, ds.RasterYSize)
 
-        x = np.arange(0, gtif.RasterXSize)
-        y = np.arange(0, gtif.RasterYSize)
         xx, yy = np.meshgrid(x, y)
-
         self.lon = trans[1] * xx + trans[2] * yy + trans[0]
         self.lat = trans[4] * xx + trans[5] * yy + trans[3]
+
+        # Transpose
+        self.image = np.transpose(arr, (1, 2, 0))
+
+    def list_files(self, datadir, imdate):
+        """
+        List the files containing visible images either from
+        [WorldView](https://worldview.earthdata.nasa.gov) or from
+        [Sentinel-Hub](https://apps.sentinel-hub.com)
+        """
+        filelist = []
+        dtime = imdate.strftime("%Y-%m-%d")
+
+        if os.path.exists(datadir):
+            for files in os.listdir(datadir):
+                if (dtime in files) & (files.endswith(".tiff")):
+                    filelist.append(files)
+        else:
+            logger.warning("Directory {} does not exist".format(datadir))
+        return filelist
 
     def extract_area(self, domain):
         """
         ```python
-        extract_area(coordinates)
+        extract_area(domain)
         ```
         Extract the coordinates and the field in the region of interest
         :param domain: a 4-element iterable specifying the region of interest
@@ -524,6 +550,21 @@ class Visible(object):
         self.array = self.array[:, goodlon, :]
         self.lon = self.lon[:,goodlon]
         self.lat = self.lat[goodlat,:]
+
+
+    def add_to_plot(self, ax, myproj, **kwargs):
+        """
+        ```python
+        add_to_plot(ax, myproj)
+        ```
+        Add the geoTIFF image to the plot.
+
+        Inputs:
+        ------
+        ax: a figure ax object
+        myproj: a cartopy projection
+        """
+        ax.imshow(self.image, origin='upper', extent=self.extent, transform=myproj, **kwargs)
 
 
 class Altimetry(object):
@@ -826,3 +867,51 @@ def change_wall_prop(ax, coordinates, depths, angles):
 
     ax.set_zticks(np.arange(depths[0],depths[1]+10,depths[2]))
     ax.set_zticklabels(range(int(-depths[0]),-int(depths[1])-10,-int(depths[2])))
+
+def decorate_map(ax, domain, xt, yt):
+    """
+    ```python
+    decorate_map(ax, domain, xt, yt)
+    ```
+    Add labels to the map axes and limit the extent according the selected
+    `domain`.
+
+    Inputs:
+    ------
+    ax: a cartopy ax instance
+    domain: a 4-element array storing lonmin, lonmax, latmin, latmax
+    xt: array storing the xticks locations
+    yt: array storing the yticks locations
+    """
+
+    ax.set_xticks(xt)
+    ax.set_yticks(yt)
+    ax.xaxis.set_major_formatter(lon_formatter)
+    ax.yaxis.set_major_formatter(lat_formatter)
+    ax.set_xlim(domain[0], domain[1])
+    ax.set_ylim(domain[2], domain[3])
+
+def get_filelist_url(year, dayofyear):
+    """
+    Generate a list of file URLs (OPEnDAP) for the netCDF corresponding to `year` and `dayofyear`
+    """
+
+    urllist = []
+
+    for mission in ["metop_a", "metop_b"]:
+        baseurl = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ascat/preview/L2/{}/coastal_opt/{}/{}/contents.html".format(mission, year, str(dayofyear).zfill(3))
+        opendapurl = "https://opendap.jpl.nasa.gov:443/opendap/OceanWinds/ascat/preview/L2/{}/coastal_opt/".format(mission)
+
+        r = requests.get(baseurl)
+        content = r.content
+        soup = BeautifulSoup(content, "html.parser")
+
+        for link in soup.find_all('a'):
+            datalink = link.get('href')
+            if datalink.startswith("ascat_") & datalink.endswith(".gz"):
+                dataurl = os.path.join(opendapurl, str(year), str(dayofyear).zfill(3), datalink)
+                urllist.append(dataurl)
+
+    logger.info("Found {} files".format(len(urllist)))
+
+    return urllist
