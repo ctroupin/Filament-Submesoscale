@@ -9,7 +9,6 @@ __pycache__/
 *.bak
 *.swp
 *.log
-*/test*
 *.blg
 *.aux
 *.synctex.gz
