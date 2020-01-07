@@ -1,10 +1,35 @@
 language: python
-python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7"
-  - "3.8"
+
+env:
+  global:
+    - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
+    - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
+    - GDALINST=$HOME/gdalinstall
+    - GDALBUILD=$HOME/gdalbuild
+    - PROJINST=$HOME/gdalinstall
+    - PROJBUILD=$HOME/projbuild
+
+jobs:
+  include:
+    - python: "3.6"
+      env: GDALVERSION="2.3.3" PROJVERSION="4.9.3"
+    - python: "3.6"
+      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
+    - python: "3.7"
+      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
+    - python: "3.8"
+      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
+    - python: "3.6"
+      env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
+    - python: "3.7"
+      env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
+    - python: "3.8"
+      env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
+    - python: "3.8"
+      env: GDALVERSION="master" PROJVERSION="6.1.1"
+  allow_failures:
+    - env: GDALVERSION="master" PROJVERSION="6.1.1"
+
 before_install:
 - python --version
 - pip install -U pip
@@ -16,8 +41,23 @@ before_install:
 - export C_INCLUDE_PATH=/usr/include/gdal
 - sudo apt-get install libgeos-dev
 - sudo apt-get install libgdal-dev
+
+before_install:
+  - python -m pip install -U pip
+  - python -m pip install wheel
+  - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$PATH
+  - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$LD_LIBRARY_PATH
+  - . ./scripts/travis_proj_install.sh
+  - travis_wait 20 . ./scripts/travis_gdal_install.sh
+  - export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
+  - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
+
 install:
-  - pip3 install GDAL==$(gdal-config --version) 
+  - "if [ \"$GDALVERSION\" == \"master\" -o $(gdal-config --version) == \"$GDALVERSION\" ]; then echo \"Using gdal $GDALVERSION\"; else echo \"NOT using gdal $GDALVERSION as expected; aborting\"; exit 1; fi"
+  - "python -m pip wheel -r requirements-dev.txt"
+  - "python -m pip install -r requirements-dev.txt"
+  - "GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install --upgrade --force-reinstall --no-use-pep517 -e .[test,plot]"
+  - "python -m pip install coveralls>=1.1"
   - pip install -r ./python/requirements.txt
 script:
   - python -m unittest python/test/test_visible.py
