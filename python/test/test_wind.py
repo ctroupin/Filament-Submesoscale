@@ -52,7 +52,7 @@ class TestWindAscat(unittest.TestCase):
 class TestWindCCMP(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./test/data/ascat_20180313_003000_metopa_59134_eps_o_coa_2401_ovw.l2.nc.gz.nc4"
+        self.windfile = "./test/data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
         self.domain = (20.12, 40.98, -42.34, -20.)
         self.assertTrue(os.path.isfile(self.windfile))
 
@@ -65,8 +65,8 @@ class TestWindCCMP(unittest.TestCase):
         wind.lon[1] == 0.375
         wind.lat[0] == -78.375
         wind.lat[1] == -78.125
-        wind.uwind.shape == (1, 628, 1440)
-        wind.uwind.mean() == -0.11586497
+        wind.u.shape == (1, 628, 1440)
+        wind.u.mean() == -0.11586497
 
 
 
