@@ -11,6 +11,7 @@ before_install:
 - export PYTHONPATH=$PYTHONPATH:$(pwd)/python
 - sudo apt-get update
 - sudo apt-get install libproj-dev proj-data proj-bin
+- sudo apt-get install -y gdal-bin 
 - export CPLUS_INCLUDE_PATH=/usr/include/gdal
 - export C_INCLUDE_PATH=/usr/include/gdal
 - sudo apt-get install libgeos-dev
