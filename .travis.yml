@@ -8,8 +8,8 @@ python:
 before_install:
 - python --version
 - pip install -U pip
-- export PYTHONPATH=$PYTHONPATH:$(pwd)/
+- export PYTHONPATH=$PYTHONPATH:$(pwd)/python
 install:
-  - pip install -r requirements.txt
+  - pip install -r ./python/requirements.txt
 script:
   - python -m unittest python/test/test_visible.py
