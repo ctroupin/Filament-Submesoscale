@@ -11,12 +11,14 @@ before_install:
 - export PYTHONPATH=$PYTHONPATH:$(pwd)/python
 - sudo apt-get update
 - sudo apt-get install libproj-dev proj-data proj-bin
-- sudo apt-get install -y gdal-bin 
+- sudo apt-get install -y gdal-bin
 - export CPLUS_INCLUDE_PATH=/usr/include/gdal
 - export C_INCLUDE_PATH=/usr/include/gdal
 - sudo apt-get install libgeos-dev
 - sudo apt-get install libgdal-dev
 install:
+  - pip install --no-deps .
+  - python -c "import cartopy; print('Version ', cartopy.__version__)" && python setup.py versionl
   - pip install -r ./python/requirements.txt
 script:
   - python -m unittest python/test/test_visible.py

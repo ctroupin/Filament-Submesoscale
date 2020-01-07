@@ -1,4 +1,3 @@
-Cartopy==0.17.0
 cftime==1.0.3.4
 cmocean==1.2
 cycler==0.10.0
