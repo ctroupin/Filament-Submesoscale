@@ -9,8 +9,8 @@ import logging
 class TestVisible(unittest.TestCase):
 
     def setUp(self):
-        self.datadir = "./test/data/"
-        self.fname = "./test/data/snapshot-2019-12-28T00_00_00Z.tiff"
+        self.datadir = "./python/test/data/"
+        self.fname = "./python/test/data/snapshot-2019-12-28T00_00_00Z.tiff"
         self.assertTrue(os.path.isfile(self.fname))
         self.assertTrue(os.path.isdir(self.datadir))
 

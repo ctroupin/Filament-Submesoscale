@@ -6,7 +6,7 @@ import unittest
 class TestWindAscat(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./test/data/ascat_20180313_003000_metopa_59134_eps_o_coa_2401_ovw.l2.nc.gz.nc4"
+        self.windfile = "./python/test/data/ascat_20180313_003000_metopa_59134_eps_o_coa_2401_ovw.l2.nc.gz.nc4"
         self.domain = (-50., -40., 0., 20.)
         self.domain2 = (100., 140., 0., 20.)
         self.assertTrue(os.path.isfile(self.windfile))
@@ -52,9 +52,10 @@ class TestWindAscat(unittest.TestCase):
 class TestWindCCMP(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./test/data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
+        self.windfile = "./python/test/data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
+        self.windfile = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ccmp/L3.5a/monthly/flk/2010/month_20100101_v11l35flk.nc.gz"
         self.domain = (20.12, 40.98, -42.34, -20.)
-        self.assertTrue(os.path.isfile(self.windfile))
+        # self.assertTrue(os.path.exists(self.windfile))
 
     def test_read_ccmp(self):
         wind = filament.Wind()
@@ -67,9 +68,6 @@ class TestWindCCMP(unittest.TestCase):
         wind.lat[1] == -78.125
         wind.u.shape == (1, 628, 1440)
         wind.u.mean() == -0.11586497
-
-
-
 
 if __name__ == '__main__':
     unittest.main()
