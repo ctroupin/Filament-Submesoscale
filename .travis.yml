@@ -31,24 +31,18 @@ jobs:
     - env: GDALVERSION="master" PROJVERSION="6.1.1"
 
 before_install:
-- python --version
-- pip install -U pip
-- export PYTHONPATH=$PYTHONPATH:$(pwd)/python
-- sudo apt-get update
-- sudo apt-get install libproj-dev proj-data proj-bin
-- sudo apt-get install -y gdal-bin
-- export CPLUS_INCLUDE_PATH=/usr/include/gdal
-- export C_INCLUDE_PATH=/usr/include/gdal
-- sudo apt-get install libgeos-dev
-- sudo apt-get install libgdal-dev
-
-before_install:
+  - python --version
+  - pip install -U pip
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)/python
+  - sudo apt-get update
   - python -m pip install -U pip
   - python -m pip install wheel
+  - wget https://raw.githubusercontent.com/mapbox/rasterio/master/scripts/travis_gdal_install.sh
+  - wget https://raw.githubusercontent.com/mapbox/rasterio/master/scripts/travis_proj_install.sh
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$LD_LIBRARY_PATH
-  - . ./scripts/travis_proj_install.sh
-  - travis_wait 20 . ./scripts/travis_gdal_install.sh
+  - . ./travis_proj_install.sh
+  - travis_wait 20 . ./travis_gdal_install.sh
   - export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
   - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
 
