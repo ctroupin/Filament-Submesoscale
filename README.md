@@ -18,3 +18,7 @@ Useful [references](./references.md) about
 * upwelling filaments
 * eastern boundary current upwelling systems (EBUS)
 * submesoscale processes in the ocean.
+
+## Gallery
+
+Some nice [filament images](./gallery.md) from satellites.
