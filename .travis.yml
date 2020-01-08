@@ -19,6 +19,8 @@ before_install:
   - pip install -U pip
   - export PYTHONPATH=$PYTHONPATH:$(pwd)/python
   - sudo apt-get update
+  - sudo apt-get install libproj-dev proj-data proj-bin
+  - sudo apt-get install libgeos-dev  
 
 install:
   - pip install -r ./python/requirements.txt
