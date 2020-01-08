@@ -8,7 +8,7 @@ env:
     - GDALBUILD=$HOME/gdalbuild
     - PROJINST=$HOME/gdalinstall
     - PROJBUILD=$HOME/projbuild
-    
+
 jobs:
   include:
     - python: "3.7"
@@ -21,6 +21,6 @@ before_install:
   - sudo apt-get update
 
 install:
-  - pip install ./python/requirements.txt
+  - pip install -r ./python/requirements.txt
 script:
   - python -m unittest python/test/test_visible.py
