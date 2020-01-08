@@ -8,47 +8,19 @@ env:
     - GDALBUILD=$HOME/gdalbuild
     - PROJINST=$HOME/gdalinstall
     - PROJBUILD=$HOME/projbuild
-
+    
 jobs:
   include:
-    - python: "3.6"
-      env: GDALVERSION="2.3.3" PROJVERSION="4.9.3"
-    - python: "3.6"
-      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
-    - python: "3.7"
-      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
-    - python: "3.8"
-      env: GDALVERSION="2.4.3" PROJVERSION="4.9.3"
-    - python: "3.6"
-      env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
     - python: "3.7"
       env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
-    - python: "3.8"
-      env: GDALVERSION="3.0.1" PROJVERSION="6.1.1"
-    - python: "3.8"
-      env: GDALVERSION="master" PROJVERSION="6.1.1"
-  allow_failures:
-    - env: GDALVERSION="master" PROJVERSION="6.1.1"
 
 before_install:
   - python --version
   - pip install -U pip
   - export PYTHONPATH=$PYTHONPATH:$(pwd)/python
   - sudo apt-get update
-  - python -m pip install -U pip
-  - python -m pip install wheel
-  - wget https://raw.githubusercontent.com/mapbox/rasterio/master/scripts/travis_gdal_install.sh
-  - wget https://raw.githubusercontent.com/mapbox/rasterio/master/scripts/travis_proj_install.sh
-  - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$PATH
-  - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$LD_LIBRARY_PATH
-  - . ./travis_proj_install.sh
-  - travis_wait 20 . ./travis_gdal_install.sh
-  - export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
-  - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
 
 install:
-  - "if [ \"$GDALVERSION\" == \"master\" -o $(gdal-config --version) == \"$GDALVERSION\" ]; then echo \"Using gdal $GDALVERSION\"; else echo \"NOT using gdal $GDALVERSION as expected; aborting\"; exit 1; fi"
-  - "python -m pip install coveralls>=1.1"
-  - pip install -r ./python/requirements.txt
+  - pip install ./python/requirements.txt
 script:
   - python -m unittest python/test/test_visible.py
