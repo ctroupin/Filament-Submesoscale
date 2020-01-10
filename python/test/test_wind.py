@@ -3,6 +3,22 @@ import filament
 import numpy as np
 import unittest
 
+class TestWindList(unittest.TestCase):
+    """
+    Tests for the functions returning the list of OPEnDAP URLs
+    for QuikSCAT and ASCAT
+    """
+    def test_list_qs(self):
+        qslist = filament.get_filelist_url_quikscat(2009, 154)
+        self.assertEqual(len(qslist), 14)
+        self.assertEqual(qslist[0], 'https://opendap.jpl.nasa.gov/opendap/OceanWinds/quikscat/L2B12/v4.0/2009/154/qs_l2b_51845_v4.0_200906030115.nc')
+        self.assertEqual(qslist[-1], 'https://opendap.jpl.nasa.gov/opendap/OceanWinds/quikscat/L2B12/v4.0/2009/154/qs_l2b_51858_v4.0_200906032308.nc')
+    def test_list_as(self):
+        aslist = filament.get_filelist_url(2019, 3)
+        self.assertEqual(len(aslist), 28)
+        self.assertEqual(aslist[0], 'https://opendap.jpl.nasa.gov:443/opendap/OceanWinds/ascat/preview/L2/metop_a/coastal_opt/2019/003/ascat_20190103_013900_metopa_63340_eps_o_coa_3201_ovw.l2.nc.gz')
+        self.assertEqual(aslist[-1],'https://opendap.jpl.nasa.gov:443/opendap/OceanWinds/ascat/preview/L2/metop_b/coastal_opt/2019/003/ascat_20190103_230000_metopb_32666_eps_o_coa_3201_ovw.l2.nc.gz')
+
 class TestWindAscat(unittest.TestCase):
 
     def setUp(self):
@@ -10,9 +26,6 @@ class TestWindAscat(unittest.TestCase):
         self.domain = (-50., -40., 0., 20.)
         self.domain2 = (100., 140., 0., 20.)
         self.assertTrue(os.path.isfile(self.windfile))
-
-    def test_list(self):
-        wind = filament.Wind()
 
     def test_read_ascat(self):
         wind = filament.Wind()
@@ -53,7 +66,7 @@ class TestWindCCMP(unittest.TestCase):
 
     def setUp(self):
         self.windfile = "./python/test/data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
-        self.windfile = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ccmp/L3.5a/monthly/flk/2010/month_20100101_v11l35flk.nc.gz"
+        # self.windfile = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ccmp/L3.5a/monthly/flk/2010/month_20100101_v11l35flk.nc.gz"
         self.domain = (20.12, 40.98, -42.34, -20.)
         # self.assertTrue(os.path.exists(self.windfile))
 
