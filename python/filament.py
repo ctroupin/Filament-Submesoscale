@@ -17,6 +17,9 @@ import scipy.io as sio
 import warnings
 import matplotlib.cbook
 from matplotlib import colors
+from lxml import html
+from bs4 import BeautifulSoup
+import requests
 
 logger = logging.getLogger("Filament")
 
@@ -911,6 +914,29 @@ def get_filelist_url(year, dayofyear):
             if datalink.startswith("ascat_") & datalink.endswith(".gz"):
                 dataurl = os.path.join(opendapurl, str(year), str(dayofyear).zfill(3), datalink)
                 urllist.append(dataurl)
+
+    logger.info("Found {} files".format(len(urllist)))
+
+    return urllist
+
+def get_filelist_url_quikscat(year, dayofyear):
+    """
+    Generate a list of file URLs (OPEnDAP) for the netCDF corresponding to `year` and `dayofyear`
+    """
+
+    urllist = []
+
+    baseurl = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/quikscat/L2B12/v4.0/{}/{}/contents.html".format(year, str(dayofyear).zfill(3))
+    opendapurl = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/quikscat/L2B12/v4.0/"
+    r = requests.get(baseurl)
+    content = r.content
+    soup = BeautifulSoup(content, "html.parser")
+
+    for link in soup.find_all('a'):
+        datalink = link.get('href')
+        if datalink.startswith("qs") & datalink.endswith(".nc"):
+            dataurl = os.path.join(opendapurl, str(year), str(dayofyear).zfill(3), datalink)
+            urllist.append(dataurl)
 
     logger.info("Found {} files".format(len(urllist)))
 
