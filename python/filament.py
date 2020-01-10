@@ -7,7 +7,6 @@ import seawater
 from osgeo import gdal
 from scipy import interpolate
 import matplotlib.pyplot as plt
-import cartopy
 import matplotlib.patches as patches
 from matplotlib.path import Path
 from mpl_toolkits.mplot3d import Axes3D
@@ -20,6 +19,14 @@ from matplotlib import colors
 from lxml import html
 from bs4 import BeautifulSoup
 import requests
+import cartopy
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import cartopy.mpl.ticker as cartopyticker
+myproj = ccrs.PlateCarree()
+coast = cfeature.GSHHSFeature(scale="full")
+lon_formatter = cartopyticker.LongitudeFormatter()
+lat_formatter = cartopyticker.LatitudeFormatter()
 
 logger = logging.getLogger("Filament")
 
@@ -137,6 +144,53 @@ class SST(object):
         figname = os.path.splitext(figname)[0]
         figname = figname.replace(".", "-")
         return figname
+
+    def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.thermal,
+                    clim=[15., 30.], date=None, vis=False,
+                    cbarloc=[0.18, 0.75, 0.2, 0.015]):
+        """
+        ```python
+        sst.add_to_plot(fig, ax, domain, cmap, clim, date)
+        ```
+        Display the SST field
+
+        Inputs:
+        fig: matplotlib.figure.Figure instance
+        ax: a 'cartopy.mpl.geoaxes.GeoAxesSubplot'
+        domain: a 4-element tuple storing (lonmin, lonmax, latmin, latmax)
+        cmap: the colormap
+        clim: limits of the colorbar
+        date: the date to be added to the plot
+        """
+
+        if date is not None:
+            plt.text(0.15, 0.95, date, size=18, rotation=0.,
+                     ha="center", va="center",
+                     transform=ax.transAxes,
+                     bbox=dict(boxstyle="round",
+                               ec=(1., 0.5, 0.5),
+                               fc=(1., 1., 1.),
+                               alpha=.7
+                               )
+                     )
+        pcm = ax.pcolormesh(self.lon, self.lat, self.field, cmap=cmap,
+                            vmin=clim[0], vmax=clim[1])
+
+        if domain is not None:
+            ax.set_xlim(domain[0], domain[1])
+            ax.set_ylim(domain[2], domain[3])
+
+        cbar_ax = fig.add_axes(cbarloc)
+
+        if vis is True:
+            textcolor = "w"
+        else:
+            textcolor = "k"
+        cb = plt.colorbar(pcm, orientation="horizontal", cax=cbar_ax, extend="both")
+        cb.set_label("$^{\circ}$C", fontsize=12, color=textcolor)
+        cb.ax.xaxis.set_tick_params(color=textcolor)
+        cb.outline.set_edgecolor(textcolor)
+        plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
 
     def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None,
                   vmin=16., vmax=24., shrink=1.):
@@ -279,13 +333,52 @@ class Swot(object):
 
 class Wind(object):
 
-    def __init__(self, lon=None, lat=None, u=None, v=None, speed=None, angle=None):
+    def __init__(self, lon=None, lat=None, u=None, v=None, time=None, speed=None, angle=None):
         self.lon = lon
         self.lat = lat
         self.u = u
         self.v = v
+        self.time = time
         self.speed = speed
         self.angle = angle
+
+    def read_from_quikscat(self, datafile, domain=[-180., 180., -90., 90.]):
+        """
+        ```python
+        read_from_quikscat(datafile, domain)
+        ```
+        Extract the wind data from `datafile` and subset them on `domain`
+        """
+        with netCDF4.Dataset(datafile, "r") as nc:
+            t = nc.variables["time"][0]
+            timeunits = nc.variables["time"].units
+            self.time = netCDF4.num2date(t, timeunits)
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:] - 360.
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+
+            logger.info(lon.shape)
+
+            # Check if we have data in the domain of interest
+            goodlon = (lon <= domain[1]) & (lon >= domain[0])
+            goodlat = (lat <= domain[3]) & (lat >= domain[2])
+            goodcoord = (lon <= domain[1]) & (lon >= domain[0]) & (lat <= domain[3]) & (lat >= domain[2])
+            ngood = goodcoord.sum().sum()
+
+            if ngood > 0:
+                logger.info("Subsetting data to region of interest")
+                self.lon = lon[goodcoord]
+                self.lat = lat[goodcoord]
+                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:][goodcoord]
+                self.angle = nc.get_variables_by_attributes(standard_name="wind_to_direction")[0][:][goodcoord]
+
+                self.u = self.speed * np.sin(np.deg2rad(self.angle))
+                self.v = self.speed * np.cos(np.deg2rad(self.angle))
+                res = True
+            else:
+                logger.info("No data in the region of interest")
+                res = False
+
+        return res
 
     def read_from_ccmp(self, datafile, domain=None):
         """
@@ -419,7 +512,8 @@ class Wind(object):
         return res
 
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
-                    clim=[0, 15], date=None, vis=False):
+                    clim=[0, 15], date=None, vis=False,
+                    cbarloc=[0.18, 0.75, 0.2, 0.015]):
         """
         ```python
         wind.add_to_plot(fig, ax, domain, cmap, clim=[0, 15], date)
@@ -457,7 +551,7 @@ class Wind(object):
         ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
                        layers=['coastlines'])
 
-        cbar_ax = fig.add_axes([0.18, 0.75, 0.2, 0.015])
+        cbar_ax = fig.add_axes(cbarloc)
         if clim[0] == 0.:
             ext = "max"
         else:
@@ -468,7 +562,7 @@ class Wind(object):
         else:
             textcolor = "k"
         cb = plt.colorbar(qv, orientation="horizontal", cax=cbar_ax, extend=ext)
-        cb.set_label("m/s (max. = {:.2f})".format(self.speed.max()), fontsize=12,
+        cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=12,
                      color=textcolor)
         cb.ax.xaxis.set_tick_params(color=textcolor)
         cb.outline.set_edgecolor(textcolor)
@@ -886,7 +980,6 @@ def decorate_map(ax, domain, xt, yt):
     xt: array storing the xticks locations
     yt: array storing the yticks locations
     """
-
     ax.set_xticks(xt)
     ax.set_yticks(yt)
     ax.xaxis.set_major_formatter(lon_formatter)
@@ -923,7 +1016,6 @@ def get_filelist_url_quikscat(year, dayofyear):
     """
     Generate a list of file URLs (OPEnDAP) for the netCDF corresponding to `year` and `dayofyear`
     """
-
     urllist = []
 
     baseurl = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/quikscat/L2B12/v4.0/{}/{}/contents.html".format(year, str(dayofyear).zfill(3))
