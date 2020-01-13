@@ -5,6 +5,7 @@ import datetime
 import numpy as np
 import seawater
 from osgeo import gdal
+from osgeo import osr
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -485,6 +486,9 @@ class Wind(object):
             with netCDF4.Dataset(dataurl) as nc:
                 lon = nc.variables["lon"][:] - 360.
                 lat = nc.variables["lat"][:]
+                time = nc.variables["time"][0][0]
+                timeunits = nc.variables["time"].units
+                self.time = netCDF4.num2date(time, timeunits)
 
             # Check if we have data in the domain of interest
             goodlon = (lon <= domain[1]) & (lon >= domain[0])
@@ -531,8 +535,8 @@ class Wind(object):
         """
 
         if date is not None:
-            plt.text(0.15, 0.95, date, size=18, rotation=0.,
-                     ha="center", va="center",
+            plt.text(0.05, 0.95, date, size=18, rotation=0.,
+                     ha="left", va="center",
                      transform=ax.transAxes,
                      bbox=dict(boxstyle="round",
                                ec=(1., 0.5, 0.5),
@@ -548,8 +552,8 @@ class Wind(object):
             ax.set_ylim(domain[2], domain[3])
 
         # Add high-resolution coastline
-        ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
-                       layers=['coastlines'])
+        #ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
+        #                layers=['coastlines'])
 
         cbar_ax = fig.add_axes(cbarloc)
         if clim[0] == 0.:
