@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PANDOC="/home/ctroupin/bin/pandoc"
-PANDOCRUN="${PANDOC} -t markdown_strict --filter=pandoc-citeproc --standalone --csl ocean-science.csl"
+PANDOCRUN="${PANDOC} -t markdown_strict --filter=pandoc-citeproc --standalone --csl journal-of-physical-oceanography.csl"
 
 for reffiles in $(ls ./*ref.md); do
 		outputfile=${reffiles%'_ref.md'}".md"

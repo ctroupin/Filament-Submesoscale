@@ -1,483 +1,388 @@
 ### Submesoscale processes
 
-Bachman, S. and Taylor, J.: Modelling of partially-resolved oceanic
-symmetric instability, Ocean Modelling, 82, 15–27,
-doi:[10.1016/j.ocemod.2014.07.006](https://doi.org/10.1016/j.ocemod.2014.07.006),
-2014.
+Bachman, S., and J. Taylor, 2014: Modelling of partially-resolved
+oceanic symmetric instability. *Ocean Modelling*, **82**, 15–27,
+<https://doi.org/10.1016/j.ocemod.2014.07.006>.
 
-Bachman, S., Fox-Kemper, B., Taylor, J. and Thomas, L.: Parameterization
-of frontal symmetric instabilities. I: Theory for resolved fronts, Ocean
-Modelling, 109, 72–95,
-doi:[10.1016/j.ocemod.2016.12.003](https://doi.org/10.1016/j.ocemod.2016.12.003),
-2017.
+——, B. Fox-Kemper, ——, and L. Thomas, 2017: Parameterization of frontal
+symmetric instabilities. I: Theory for resolved fronts. *Ocean
+Modelling*, **109**, 72–95,
+<https://doi.org/10.1016/j.ocemod.2016.12.003>.
 
-Baschek, B., Benavides, I., North, R. P., Smith, G. and Miller, D.:
-Submesoscale dynamics in the coastal ocean, The Journal of the
-Acoustical Society of America, 141(5), 3545–3545,
-doi:[10.1121/1.4987499](https://doi.org/10.1121/1.4987499), 2017.
+Baschek, B., I. Benavides, R. P. North, G. Smith, and D. Miller, 2017:
+Submesoscale dynamics in the coastal ocean. *The Journal of the
+Acoustical Society of America*, **141**, 3545–3545,
+<https://doi.org/10.1121/1.4987499>.
 
-Bode, A., Alvarez-Ossorio, M., Cabanas, J., Miranda, A. and Varela, M.:
-Recent trends in plankton and upwelling intensity off galicia (nw
-spain), Progress in Oceanography, 83(1), 342–350,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.025](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.025),
-2009.
+Bode, A., M. Alvarez-Ossorio, J. Cabanas, A. Miranda, and M. Varela,
+2009: Recent trends in plankton and upwelling intensity off galicia (nw
+spain). *Progress in Oceanography*, **83**, 342–350,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.025>.
 
-Brannigan, L., Marshall, D. P., Naveira-Garabato, A. and George Nurser,
-A.: The seasonal cycle of submesoscale flows, Ocean Modelling, 92,
-69–84,
-doi:[10.1016/j.ocemod.2015.05.002](https://doi.org/10.1016/j.ocemod.2015.05.002),
-2015.
+Brannigan, L., D. P. Marshall, A. Naveira-Garabato, and A. George
+Nurser, 2015: The seasonal cycle of submesoscale flows. *Ocean
+Modelling*, **92**, 69–84,
+<https://doi.org/10.1016/j.ocemod.2015.05.002>.
 
-Brannigan, L., Marshall, D. P., Naveira Garabato, A. C., Nurser, A. J.
-G. and Kaiser, J.: Submesoscale instabilities in mesoscale eddies,
-Journal of Physical Oceanography, 47(12), 3061–3085,
-doi:[10.1175/jpo-d-16-0178.1](https://doi.org/10.1175/jpo-d-16-0178.1),
-2017.
+——, ——, A. C. Naveira Garabato, A. J. G. Nurser, and J. Kaiser, 2017:
+Submesoscale instabilities in mesoscale eddies. *Journal of Physical
+Oceanography*, **47**, 3061–3085,
+<https://doi.org/10.1175/jpo-d-16-0178.1>.
 
-Brochier, T., Colas, F., Lett, C., Echevin, V., Cubillos, L., Tam, J.,
-Chlaida, M., Mullon, C. and Fréon, P.: Small pelagic fish reproductive
+Brochier, T. and Coauthors, 2009: Small pelagic fish reproductive
 strategies in upwelling systems: A natal homing evolutionary model to
-study environmental constraints, Progress in Oceanography, 83(1),
-261–269,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.044](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.044),
-2009.
+study environmental constraints. *Progress in Oceanography*, **83**,
+261–269, <https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.044>.
 
-Bruno, M., Chioua, J., Romero, J., Vázquez, A., Macías, D., Dastis, C.,
-Ramírez-Romero, E., Echevarria, F., Reyes, J. and García, C.: The
-importance of sub-mesoscale processes for the exchange of properties
-through the strait of gibraltar, Progress in Oceanography, 116, 66–79,
-doi:[10.1016/j.pocean.2013.06.006](https://doi.org/10.1016/j.pocean.2013.06.006),
-2013.
+Bruno, M. and Coauthors, 2013: The importance of sub-mesoscale processes
+for the exchange of properties through the strait of gibraltar.
+*Progress in Oceanography*, **116**, 66–79,
+<https://doi.org/10.1016/j.pocean.2013.06.006>.
 
-Buckingham, C. E., Naveira Garabato, A. C., Thompson, A. F., Brannigan,
-L., Lazar, A., Marshall, D. P., George Nurser, A. J., Damerell, G.,
-Heywood, K. J. and Belcher, S. E.: Seasonality of submesoscale flows in
-the ocean surface boundary layer, Geophysical Research Letters, 43(5),
-2118–2126,
-doi:[10.1002/2016gl068009](https://doi.org/10.1002/2016gl068009), 2016.
+Buckingham, C. E. and Coauthors, 2016: Seasonality of submesoscale flows
+in the ocean surface boundary layer. *Geophysical Research Letters*,
+**43**, 2118–2126, <https://doi.org/10.1002/2016gl068009>.
 
-Callies, J., Ferrari, R., Klymak, J. M. and Gula, J.: Seasonality in
-submesoscale turbulence, Nature Communications, 6(1),
-doi:[10.1038/ncomms7862](https://doi.org/10.1038/ncomms7862), 2015.
+Callies, J., R. Ferrari, J. M. Klymak, and J. Gula, 2015: Seasonality in
+submesoscale turbulence. *Nature Communications*, **6**,
+<https://doi.org/10.1038/ncomms7862>.
 
-Capet, X., McWilliams, J. C., Molemaker, M. J. and Shchepetkin, A. F.:
-Mesoscale to submesoscale transition in the california current system.
-Part i: Flow structure, eddy flux, and observational tests, Journal of
-Physical Oceanography, 38(1), 29–43,
-doi:[10.1175/2007jpo3671.1](https://doi.org/10.1175/2007jpo3671.1),
-2008a.
+Capet, X., J. C. McWilliams, M. J. Molemaker, and A. F. Shchepetkin,
+2008a: Mesoscale to submesoscale transition in the california current
+system. Part i: Flow structure, eddy flux, and observational tests.
+*Journal of Physical Oceanography*, **38**, 29–43,
+<https://doi.org/10.1175/2007jpo3671.1>.
 
-Capet, X., McWilliams, J. C., Molemaker, M. J. and Shchepetkin, A. F.:
-Mesoscale to submesoscale transition in the california current system.
-Part ii: Frontal processes, Journal of Physical Oceanography, 38(1),
-44–64,
-doi:[10.1175/2007jpo3672.1](https://doi.org/10.1175/2007jpo3672.1),
-2008b.
+——, ——, ——, and ——, 2008b: Mesoscale to submesoscale transition in the
+california current system. Part ii: Frontal processes. *Journal of
+Physical Oceanography*, **38**, 44–64,
+<https://doi.org/10.1175/2007jpo3672.1>.
 
-Chaigneau, A., Eldin, G. and Dewitte, B.: Eddy activity in the four
-major upwelling systems from satellite altimetry (1992–2007), Progress
-in Oceanography, 83(1), 117–123,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.012](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.012),
-2009.
+Chaigneau, A., G. Eldin, and B. Dewitte, 2009: Eddy activity in the four
+major upwelling systems from satellite altimetry (1992–2007). *Progress
+in Oceanography*, **83**, 117–123,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.012>.
 
-Chang, Y. S., Choi, B.-J. and Park, Y.-G.: Seasonal variation of
+Chang, Y. S., B.-J. Choi, and Y.-G. Park, 2018: Seasonal variation of
 submesoscale flow features in a mesoscale eddy-dominant region in the
-east sea, Ocean Science Journal, 53(2), 191–206,
-doi:[10.1007/s12601-018-0008-0](https://doi.org/10.1007/s12601-018-0008-0),
-2018.
+east sea. *Ocean Science Journal*, **53**, 191–206,
+<https://doi.org/10.1007/s12601-018-0008-0>.
 
-Charria, G., Theetten, S., Vandermeirsch, F., Yelekçi, Ö. and Audiffren,
-N.: Interannual evolution of (sub)mesoscale dynamics in the bay of
-biscay, Ocean Science, 13(5), 777–797,
-doi:[10.5194/os-13-777-2017](https://doi.org/10.5194/os-13-777-2017),
-2017.
+Charria, G., S. Theetten, F. Vandermeirsch, Ö. Yelekçi, and N.
+Audiffren, 2017: Interannual evolution of (sub)mesoscale dynamics in the
+bay of biscay. *Ocean Science*, **13**, 777–797,
+<https://doi.org/10.5194/os-13-777-2017>.
 
-Chavanne, C. P. and Klein, P.: Can oceanic submesoscale processes be
-observed with satellite altimetry?, Geophysical Research Letters,
-37(22), n/a–n/a,
-doi:[10.1029/2010gl045057](https://doi.org/10.1029/2010gl045057), 2010.
+Chavanne, C. P., and P. Klein, 2010: Can oceanic submesoscale processes
+be observed with satellite altimetry? *Geophysical Research Letters*,
+**37**, n/a–n/a, <https://doi.org/10.1029/2010gl045057>.
 
-Checkley, D. M. and Barth, J. A.: Patterns and processes in the
-california current system, Progress in Oceanography, 83(1), 49–64,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.028](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.028),
-2009.
+Checkley, D. M., and J. A. Barth, 2009: Patterns and processes in the
+california current system. *Progress in Oceanography*, **83**, 49–64,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.028>.
 
-Crawford, R. J.: A recent increase of swift terns thalasseus bergii off
-south africa – the possible influence of an altered abundance and
-distribution of prey, Progress in Oceanography, 83(1), 398–403,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.021](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.021),
-2009.
+Crawford, R. J., 2009: A recent increase of swift terns thalasseus
+bergii off south africa – the possible influence of an altered abundance
+and distribution of prey. *Progress in Oceanography*, **83**, 398–403,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.021>.
 
-D’Asaro, E. A., Shcherbina, A. Y., Klymak, J. M., Molemaker, J.,
-Novelli, G., Guigand, C. M., Haza, A. C., Haus, B. K., Ryan, E. H.,
-Jacobs, G. A. and al.: Ocean convergence and the dispersion of flotsam,
-Proceedings of the National Academy of Sciences, 115(6), 1162–1167,
-doi:[10.1073/pnas.1718453115](https://doi.org/10.1073/pnas.1718453115),
-2018.
+D’Asaro, E. A. and Coauthors, 2018: Ocean convergence and the dispersion
+of flotsam. *Proceedings of the National Academy of Sciences*, **115**,
+1162–1167, <https://doi.org/10.1073/pnas.1718453115>.
 
-Della Penna, A. and Gaube, P.: Overview of (sub)mesoscale ocean dynamics
-for the naames field program, Frontiers in Marine Science, 6, 384,
-doi:[10.3389/fmars.2019.00384](https://doi.org/10.3389/fmars.2019.00384),
-2019.
+Della Penna, A., and P. Gaube, 2019: Overview of (sub)mesoscale ocean
+dynamics for the naames field program. *Frontiers in Marine Science*,
+**6**, 384, <https://doi.org/10.3389/fmars.2019.00384>.
 
-Ducousso, N., Le Sommer, J., Molines, J.-M. and Bell, M.: Impact of the
-“symmetric instability of the computational kind” at mesoscale- and
-submesoscale-permitting resolutions, Ocean Modelling, 120, 18–26,
-doi:[10.1016/j.ocemod.2017.10.006](https://doi.org/10.1016/j.ocemod.2017.10.006),
-2017.
+Ducousso, N., J. Le Sommer, J.-M. Molines, and M. Bell, 2017: Impact of
+the “symmetric instability of the computational kind” at mesoscale- and
+submesoscale-permitting resolutions. *Ocean Modelling*, **120**, 18–26,
+<https://doi.org/10.1016/j.ocemod.2017.10.006>.
 
-du Plessis, M., Swart, S., Ansorge, I. J. and Mahadevan, A.:
+du Plessis, M., S. Swart, I. J. Ansorge, and A. Mahadevan, 2017:
 Submesoscale processes promote seasonal restratification in the
-subantarctic ocean, Journal of Geophysical Research: Oceans, 122(4),
-2960–2975,
-doi:[10.1002/2016jc012494](https://doi.org/10.1002/2016jc012494), 2017.
+subantarctic ocean. *Journal of Geophysical Research: Oceans*, **122**,
+2960–2975, <https://doi.org/10.1002/2016jc012494>.
 
-Espinoza, P., Bertrand, A., Lingen, C. D. van der, Garrido, S. and
-Mendiola, B. R. de: Diet of sardine (sardinops sagax) in the northern
+Espinoza, P., A. Bertrand, C. D. van der Lingen, S. Garrido, and B. R.
+de Mendiola, 2009: Diet of sardine (sardinops sagax) in the northern
 humboldt current system and comparison with the diets of clupeoids in
-this and other eastern boundary upwelling systems, Progress in
-Oceanography, 83(1), 242–250,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.045](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.045),
-2009.
+this and other eastern boundary upwelling systems. *Progress in
+Oceanography*, **83**, 242–250,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.045>.
 
-Fernández, C., Farías, L. and Alcaman, M.: Primary production and
+Fernández, C., L. Farías, and M. Alcaman, 2009: Primary production and
 nitrogen regeneration processes in surface waters of the peruvian
-upwelling system, Progress in Oceanography, 83(1), 159–168,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.010](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.010),
-2009.
+upwelling system. *Progress in Oceanography*, **83**, 159–168,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.010>.
 
-Fox-Kemper, B., Adcroft, A., Böning, C. W., Chassignet, E. P.,
-Curchitser, E., Danabasoglu, G., Eden, C., England, M. H., Gerdes, R.,
-Greatbatch, R. J. and al.: Challenges and prospects in ocean circulation
-models, Frontiers in Marine Science, 6,
-doi:[10.3389/fmars.2019.00065](https://doi.org/10.3389/fmars.2019.00065),
-2019.
+Fox-Kemper, B. and Coauthors, 2019: Challenges and prospects in ocean
+circulation models. *Frontiers in Marine Science*, **6**,
+<https://doi.org/10.3389/fmars.2019.00065>.
 
-Franklin, D. J., Poulton, A. J., Steinke, M., Young, J., Peeken, I. and
-Malin, G.: Dimethylsulphide, dmsp-lyase activity and microplankton
-community structure inside and outside of the mauritanian upwelling,
-Progress in Oceanography, 83(1), 134–142,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.011](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.011),
-2009.
+Franklin, D. J., A. J. Poulton, M. Steinke, J. Young, I. Peeken, and G.
+Malin, 2009: Dimethylsulphide, dmsp-lyase activity and microplankton
+community structure inside and outside of the mauritanian upwelling.
+*Progress in Oceanography*, **83**, 134–142,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.011>.
 
-Gasol, J. M., Alonso-Sáez, L., Vaqué, D., Baltar, F., Calleja, M. L.,
-Duarte, C. M. and Arístegui, J.: Mesopelagic prokaryotic bulk and
+Gasol, J. M., L. Alonso-Sáez, D. Vaqué, F. Baltar, M. L. Calleja, C. M.
+Duarte, and J. Arístegui, 2009: Mesopelagic prokaryotic bulk and
 single-cell heterotrophic activity and community composition in the nw
-africa–canary islands coastal-transition zone, Progress in Oceanography,
-83(1), 189–196,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.014](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.014),
-2009.
+africa–canary islands coastal-transition zone. *Progress in
+Oceanography*, **83**, 189–196,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.014>.
 
-Glessmer, M. S., Eden, C. and Oschlies, A.: Contribution of oxygen
-minimum zone waters to the coastal upwelling off mauritania, Progress in
-Oceanography, 83(1), 143–150,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.015](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.015),
-2009.
+Glessmer, M. S., C. Eden, and A. Oschlies, 2009: Contribution of oxygen
+minimum zone waters to the coastal upwelling off mauritania. *Progress
+in Oceanography*, **83**, 143–150,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.015>.
 
-Gommenginger, C., Chapron, B., Hogg, A., Buckingham, C., Fox-Kemper, B.,
-Eriksson, L., Soulat, F., Ubelmann, C., Ocampo-Torres, F., Nardelli, B.
-B., Griffin, D., Lopez-Dekker, P., Knudsen, P., Andersen, O., Stenseng,
-L., Stapleton, N., Perrie, W., Violante-Carvalho, N.,
-Schulz-Stellenfleth, J., Woolf, D., Isern-Fontanet, J., Ardhuin, F.,
-Klein, P., Mouche, A., Pascual, A., Capet, X., Hauser, D., Stoffelen,
-A., Morrow, R., Aouf, L., Breivik, Ø., Fu, L.-L., Johannessen, J. A.,
-Aksenov, Y., Bricheno, L., Hirschi, J., Martin, A. C. H., Martin, A. P.,
-Nurser, G., Polton, J., Wolf, J., Johnsen, H., Soloviev, A., Jacobs, G.
-A., Collard, F., Groom, S., Kudryavtsev, V., Wilkin, J., Navarro, V.,
-Babanin, A., Martin, M., Siddorn, J., Saulter, A., Rippeth, T., Emery,
-B., Maximenko, N., Romeiser, R., Graber, H., Azcarate, A. A., Hughes, C.
-W., Vandemark, D., Silva, J. da, Leeuwen, P. J. V., Naveira-Garabato,
-A., Gemmrich, J., Mahadevan, A., Marquez, J., Munro, Y., Doody, S. and
-Burbidge, G.: SEASTAR: A mission to study ocean submesoscale dynamics
-and small-scale atmosphere-ocean processes in coastal, shelf and polar
-seas, Frontiers in Marine Science, 6, 457,
-doi:[10.3389/fmars.2019.00457](https://doi.org/10.3389/fmars.2019.00457),
-2019.
+Gommenginger, C. and Coauthors, 2019: SEASTAR: A mission to study ocean
+submesoscale dynamics and small-scale atmosphere-ocean processes in
+coastal, shelf and polar seas. *Frontiers in Marine Science*, **6**,
+457, <https://doi.org/10.3389/fmars.2019.00457>.
 
-González, H. E., Daneri, G., Iriarte, J. L., Yannicelli, B., Menschel,
-E., Barría, C., Pantoja, S. and Lizárraga, L.: Carbon fluxes within the
+González, H. E., G. Daneri, J. L. Iriarte, B. Yannicelli, E. Menschel,
+C. Barría, S. Pantoja, and L. Lizárraga, 2009: Carbon fluxes within the
 epipelagic zone of the humboldt current system off chile: The
 significance of euphausiids and diatoms as key functional groups for the
-biological pump, Progress in Oceanography, 83(1), 217–227,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.036](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.036),
-2009.
+biological pump. *Progress in Oceanography*, **83**, 217–227,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.036>.
 
-Gula, J., Molemaker, M. J. and McWilliams, J. C.: Topographic generation
-of submesoscale centrifugal instability and energy dissipation, Nature
-Communications, 7(1),
-doi:[10.1038/ncomms12811](https://doi.org/10.1038/ncomms12811), 2016.
+Gula, J., M. J. Molemaker, and J. C. McWilliams, 2016: Topographic
+generation of submesoscale centrifugal instability and energy
+dissipation. *Nature Communications*, **7**,
+<https://doi.org/10.1038/ncomms12811>.
 
-Hales, B., Takahashi, T. and Bandstra, L.: Atmospheric co2uptake by a
-coastal upwelling system, Global Biogeochemical Cycles, 19(1),
-doi:[10.1029/2004gb002295](https://doi.org/10.1029/2004gb002295), 2005.
+Hales, B., T. Takahashi, and L. Bandstra, 2005: Atmospheric co2uptake by
+a coastal upwelling system. *Global Biogeochemical Cycles*, **19**,
+<https://doi.org/10.1029/2004gb002295>.
 
-Hansen, J., Ruedy, R., Sato, M. and Lo, K.: Global Surface Temperature
-Change, Reviews of Geophysics, 48(4), RG4004,
-doi:[10.1029/2010rg000345](https://doi.org/10.1029/2010rg000345), 2010.
+Hansen, J., R. Ruedy, M. Sato, and K. Lo, 2010: Global Surface
+Temperature Change. *Reviews of Geophysics*, **48**, RG4004,
+<https://doi.org/10.1029/2010rg000345>.
 
-Heymans, J. J., Sumaila, U. R. and Christensen, V.: Policy options for
-the northern benguela ecosystem using a multispecies, multifleet
-ecosystem model, Progress in Oceanography, 83(1), 417–425,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.013](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.013),
-2009.
+Heymans, J. J., U. R. Sumaila, and V. Christensen, 2009: Policy options
+for the northern benguela ecosystem using a multispecies, multifleet
+ecosystem model. *Progress in Oceanography*, **83**, 417–425,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.013>.
 
-Hirata, T., Hardman-Mountford, N. J., Barlow, R., Lamont, T., Brewin,
-R., Smyth, T. and Aiken, J.: An inherent optical property approach to
-the estimation of size-specific photosynthetic rates in eastern boundary
-upwelling zones from satellite ocean colour: An initial assessment,
-Progress in Oceanography, 83(1), 393–397,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.019](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.019),
-2009.
+Hirata, T., N. J. Hardman-Mountford, R. Barlow, T. Lamont, R. Brewin, T.
+Smyth, and J. Aiken, 2009: An inherent optical property approach to the
+estimation of size-specific photosynthetic rates in eastern boundary
+upwelling zones from satellite ocean colour: An initial assessment.
+*Progress in Oceanography*, **83**, 393–397,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.019>.
 
-Hoskins, B. J.: The role of potential vorticity in symmetric stability
-and instability, Quarterly Journal of the Royal Meteorological Society,
-100(425), 480–482,
-doi:[10.1002/qj.49710042520](https://doi.org/10.1002/qj.49710042520),
-1974.
+Hoskins, B. J., 1974: The role of potential vorticity in symmetric
+stability and instability. *Quarterly Journal of the Royal
+Meteorological Society*, **100**, 480–482,
+<https://doi.org/10.1002/qj.49710042520>.
 
-Huggett, J., Verheye, H., Escribano, R. and Fairweather, T.: Copepod
+Huggett, J., H. Verheye, R. Escribano, and T. Fairweather, 2009: Copepod
 biomass, size composition and production in the southern benguela:
 Spatio–temporal patterns of variation, and comparison with other eastern
-boundary upwelling systems, Progress in Oceanography, 83(1), 197–207,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.048](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.048),
-2009.
+boundary upwelling systems. *Progress in Oceanography*, **83**, 197–207,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.048>.
 
-Hutchings, L., Lingen, C. van der, Shannon, L., Crawford, R., Verheye,
-H., Bartholomae, C., Plas, A. van der, Louw, D., Kreiner, A., Ostrowski,
-M., Fidel, Q., Barlow, R., Lamont, T., Coetzee, J., Shillington, F.,
-Veitch, J., Currie, J. and Monteiro, P.: The benguela current: An
-ecosystem of four components, Progress in Oceanography, 83(1), 15–32,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.046](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.046),
-2009.
+Hutchings, L. and Coauthors, 2009: The benguela current: An ecosystem of
+four components. *Progress in Oceanography*, **83**, 15–32,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.046>.
 
-Karakaş, G., Nowald, N., Schäfer-Neth, C., Iversen, M., Barkmann, W.,
-Fischer, G., Marchesiello, P. and Schlitzer, R.: Impact of particle
-aggregation on vertical fluxes of organic matter, Progress in
-Oceanography, 83(1), 331–341,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.047](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.047),
-2009.
+Karakaş, G., N. Nowald, C. Schäfer-Neth, M. Iversen, W. Barkmann, G.
+Fischer, P. Marchesiello, and R. Schlitzer, 2009: Impact of particle
+aggregation on vertical fluxes of organic matter. *Progress in
+Oceanography*, **83**, 331–341,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.047>.
 
-Keister, J., Cowles, T., Peterson, W. and Morgan, C.: Do upwelling
+Keister, J., T. Cowles, W. Peterson, and C. Morgan, 2009: Do upwelling
 filaments result in predictable biological distributions in coastal
-upwelling ecosystems?, Progress in Oceanography, 83(1), 303–313,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.042](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.042),
-2009.
+upwelling ecosystems? *Progress in Oceanography*, **83**, 303–313,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.042>.
 
-Köhn, E. E., Thomsen, S., Arévalo-Martı́nez, D. L. and Kanzow, T.:
+Kim, S. Y., 2010: Observations of submesoscale eddies using
+high-frequency radar-derived kinematic and dynamic quantities.
+*Continental Shelf Research*, **30**, 1639–1655,
+<https://doi.org/10.1016/j.csr.2010.06.011>.
+
+Köhn, E. E., S. Thomsen, D. L. Arévalo-Martı́nez, and T. Kanzow, 2017:
 Submesoscale co**<sub>2</sub> variability across an upwelling front off
-peru, Ocean Science, 13(6), 1017–1033,
-doi:[10.5194/os-13-1017-2017](https://doi.org/10.5194/os-13-1017-2017),
-2017.
+peru. *Ocean Science*, **13**, 1017–1033,
+<https://doi.org/10.5194/os-13-1017-2017>.
 
-Lachkar, Z. and Gruber, N.: Response of biological production and
+Lachkar, Z., and N. Gruber, 2013: Response of biological production and
 air–sea co2 fluxes to upwelling intensification in the california and
-canary current systems, Journal of Marine Systems, 109-110, 149–160,
-doi:[10.1016/j.jmarsys.2012.04.003](https://doi.org/10.1016/j.jmarsys.2012.04.003),
-2013.
+canary current systems. *Journal of Marine Systems*, **109-110**,
+149–160, <https://doi.org/10.1016/j.jmarsys.2012.04.003>.
 
-Landry, M. R., Ohman, M. D., Goericke, R., Stukel, M. R. and
-Tsyrklevich, K.: Lagrangian studies of phytoplankton growth and grazing
-relationships in a coastal upwelling ecosystem off southern california,
-Progress in Oceanography, 83(1), 208–216,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.026](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.026),
-2009.
+Landry, M. R., M. D. Ohman, R. Goericke, M. R. Stukel, and K.
+Tsyrklevich, 2009: Lagrangian studies of phytoplankton growth and
+grazing relationships in a coastal upwelling ecosystem off southern
+california. *Progress in Oceanography*, **83**, 208–216,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.026>.
 
-Lavaniegos, B. E.: Influence of a multiyear event of low salinity on the
-zooplankton from mexican eco-regions of the california current, Progress
-in Oceanography, 83(1), 369–375,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.037](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.037),
-2009.
+Lavaniegos, B. E., 2009: Influence of a multiyear event of low salinity
+on the zooplankton from mexican eco-regions of the california current.
+*Progress in Oceanography*, **83**, 369–375,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.037>.
 
-Lévy, M., Ferrari, R., Franks, P. J. S., Martin, A. P. and Rivière, P.:
-Bringing physics to life at the submesoscale, Geophysical Research
-Letters, 39(14), n/a–n/a,
-doi:[10.1029/2012gl052756](https://doi.org/10.1029/2012gl052756), 2012.
+Lévy, M., R. Ferrari, P. J. S. Franks, A. P. Martin, and P. Rivière,
+2012: Bringing physics to life at the submesoscale. *Geophysical
+Research Letters*, **39**, n/a–n/a,
+<https://doi.org/10.1029/2012gl052756>.
 
-Lévy, M., Franks, P. J. S. and Smith, K. S.: The role of submesoscale
-currents in structuring marine ecosystems, Nature Communications, 9(1),
-doi:[10.1038/s41467-018-07059-3](https://doi.org/10.1038/s41467-018-07059-3),
-2018.
+——, ——, and K. S. Smith, 2018: The role of submesoscale currents in
+structuring marine ecosystems. *Nature Communications*, **9**,
+<https://doi.org/10.1038/s41467-018-07059-3>.
 
-Liu, G., Bracco, A. and Passow, U.: The influence of mesoscale and
+Liu, G., A. Bracco, and U. Passow, 2018: The influence of mesoscale and
 submesoscale circulation on sinking particles in the northern gulf of
-mexico, Elem Sci Anth, 6(1), 36,
-doi:[10.1525/elementa.292](https://doi.org/10.1525/elementa.292), 2018.
+mexico. *Elem Sci Anth*, **6**, 36,
+<https://doi.org/10.1525/elementa.292>.
 
-Lovecchio, E., Gruber, N. and Münnich, M.: Mesoscale contribution to the
-long-range offshore transport of organic carbon from the canary
-upwelling system to the open north atlantic, Biogeosciences, 15(16),
-5061–5091,
-doi:[10.5194/bg-15-5061-2018](https://doi.org/10.5194/bg-15-5061-2018),
-2018.
+Lovecchio, E., N. Gruber, and M. Münnich, 2018: Mesoscale contribution
+to the long-range offshore transport of organic carbon from the canary
+upwelling system to the open north atlantic. *Biogeosciences*, **15**,
+5061–5091, <https://doi.org/10.5194/bg-15-5061-2018>.
 
-Marchesiello, P., Capet, X., Menkes, C. and Kennan, S. C.: Submesoscale
-dynamics in tropical instability waves, Ocean Modelling, 39(1-2), 31–46,
-doi:[10.1016/j.ocemod.2011.04.011](https://doi.org/10.1016/j.ocemod.2011.04.011),
-2011.
+Marchesiello, P., X. Capet, C. Menkes, and S. C. Kennan, 2011:
+Submesoscale dynamics in tropical instability waves. *Ocean Modelling*,
+**39**, 31–46, <https://doi.org/10.1016/j.ocemod.2011.04.011>.
 
-McWilliams, J. C.: Submesoscale currents in the ocean, Proceedings of
-the Royal Society A: Mathematical, Physical and Engineering Science,
-472(2189), 20160117,
-doi:[10.1098/rspa.2016.0117](https://doi.org/10.1098/rspa.2016.0117),
-2016.
+McWilliams, J. C., 2016: Submesoscale currents in the ocean.
+*Proceedings of the Royal Society A: Mathematical, Physical and
+Engineering Science*, **472**, 20160117,
+<https://doi.org/10.1098/rspa.2016.0117>.
 
-Molemaker, M. J., McWilliams, J. C. and Dewar, W. K.: Submesoscale
+Molemaker, M. J., J. C. McWilliams, and W. K. Dewar, 2015: Submesoscale
 instability and generation of mesoscale anticyclones near a separation
-of the california undercurrent, Journal of Physical Oceanography, 45(3),
-613–629,
-doi:[10.1175/jpo-d-13-0225.1](https://doi.org/10.1175/jpo-d-13-0225.1),
-2015.
+of the california undercurrent. *Journal of Physical Oceanography*,
+**45**, 613–629, <https://doi.org/10.1175/jpo-d-13-0225.1>.
 
-Nikurashin, M., Vallis, G. K. and Adcroft, A.: Routes to energy
-dissipation for geostrophic flows in the southern ocean, Nature
-Geoscience, 6(1), 48–51,
-doi:[10.1038/ngeo1657](https://doi.org/10.1038/ngeo1657), 2012.
+Nikurashin, M., G. K. Vallis, and A. Adcroft, 2012: Routes to energy
+dissipation for geostrophic flows in the southern ocean. *Nature
+Geoscience*, **6**, 48–51, <https://doi.org/10.1038/ngeo1657>.
 
-Omta, A. W., Kooijman, B. and Dijkstra, H.: Influence of (sub)mesoscale
-eddies on the soft-tissue carbon pump, Journal of Geophysical Research,
-112(C11),
-doi:[10.1029/2007jc004189](https://doi.org/10.1029/2007jc004189), 2007.
+Omta, A. W., B. Kooijman, and H. Dijkstra, 2007: Influence of
+(sub)mesoscale eddies on the soft-tissue carbon pump. *Journal of
+Geophysical Research*, **112**, <https://doi.org/10.1029/2007jc004189>.
 
-Pearson, J., Fox-Kemper, B., Barkan, R., Choi, J., Bracco, A. and
-McWilliams, J. C.: Impacts of convergence on structure functions from
-surface drifters in the Gulf of Mexico, Journal of Physical
-Oceanography, 49(3), 675–690,
-doi:[10.1175/jpo-d-18-0029.1](https://doi.org/10.1175/jpo-d-18-0029.1),
-2019.
+Pearson, J., B. Fox-Kemper, R. Barkan, J. Choi, A. Bracco, and J. C.
+McWilliams, 2019: Impacts of convergence on structure functions from
+surface drifters in the Gulf of Mexico. *Journal of Physical
+Oceanography*, **49**, 675–690,
+<https://doi.org/10.1175/jpo-d-18-0029.1>.
 
-Petrenko, A. A., Doglioli, A. M., Nencioli, F., Kersalé, M., Hu, Z. and
-Ovidio, F. d’: A review of the latex project: Mesoscale to submesoscale
-processes in a coastal environment, Ocean Dynamics, 67(3-4), 513–533,
-doi:[10.1007/s10236-017-1040-9](https://doi.org/10.1007/s10236-017-1040-9),
-2017.
+Petrenko, A. A., A. M. Doglioli, F. Nencioli, M. Kersalé, Z. Hu, and F.
+d’Ovidio, 2017: A review of the latex project: Mesoscale to submesoscale
+processes in a coastal environment. *Ocean Dynamics*, **67**, 513–533,
+<https://doi.org/10.1007/s10236-017-1040-9>.
 
-Renault, L., McWilliams, J. C. and Gula, J.: Dampening of submesoscale
-currents by air-sea stress coupling in the californian upwelling system,
-Scientific Reports, 8(1),
-doi:[10.1038/s41598-018-31602-3](https://doi.org/10.1038/s41598-018-31602-3),
-2018.
+Renault, L., J. C. McWilliams, and J. Gula, 2018: Dampening of
+submesoscale currents by air-sea stress coupling in the californian
+upwelling system. *Scientific Reports*, **8**,
+<https://doi.org/10.1038/s41598-018-31602-3>.
 
-Rocha, C. B., Gille, S. T., Chereskin, T. K. and Menemenlis, D.:
-Seasonality of submesoscale dynamics in the kuroshio extension,
-Geophysical Research Letters, 43(21), 11, 304–11, 311,
-doi:[10.1002/2016gl071349](https://doi.org/10.1002/2016gl071349), 2016.
+Rocha, C. B., S. T. Gille, T. K. Chereskin, and D. Menemenlis, 2016:
+Seasonality of submesoscale dynamics in the kuroshio extension.
+*Geophysical Research Letters*, **43**, 11, 304–311, 311,
+<https://doi.org/10.1002/2016gl071349>.
 
-Rousselet, L., Verneil, A. de, Doglioli, A. M., Petrenko, A. A.,
-Duhamel, S., Maes, C. and Blanke, B.: Large- to submesoscale surface
+Rousselet, L., A. de Verneil, A. M. Doglioli, A. A. Petrenko, S.
+Duhamel, C. Maes, and B. Blanke, 2018: Large- to submesoscale surface
 circulation and its implications on biogeochemical/biological horizontal
-distributions during the outpace cruise (southwest pacific),
-Biogeosciences, 15(8), 2411–2431,
-doi:[10.5194/bg-15-2411-2018](https://doi.org/10.5194/bg-15-2411-2018),
-2018.
+distributions during the outpace cruise (southwest pacific).
+*Biogeosciences*, **15**, 2411–2431,
+<https://doi.org/10.5194/bg-15-2411-2018>.
 
-Schubert, R., Schwarzkopf, F. U., Baschek, B. and Biastoch, A.:
-Submesoscale impacts on mesoscale agulhas dynamics, Journal of Advances
-in Modeling Earth Systems, 11(8), 2745–2767,
-doi:[10.1029/2019ms001724](https://doi.org/10.1029/2019ms001724), 2019.
+Schubert, R., F. U. Schwarzkopf, B. Baschek, and A. Biastoch, 2019:
+Submesoscale impacts on mesoscale agulhas dynamics. *Journal of Advances
+in Modeling Earth Systems*, **11**, 2745–2767,
+<https://doi.org/10.1029/2019ms001724>.
 
-Shcherbina, A. Y., Sundermeyer, M. A., Kunze, E., D’Asaro, E., Badin,
-G., Birch, D., Brunner-Suzuki, A.-M. E. G., Callies, J., Kuebel
-Cervantes, B. T., Claret, M. and al.: The latmix summer campaign:
-Submesoscale stirring in the upper ocean, Bulletin of the American
-Meteorological Society, 96(8), 1257–1279,
-doi:[10.1175/bams-d-14-00015.1](https://doi.org/10.1175/bams-d-14-00015.1),
-2015.
+Shcherbina, A. Y. and Coauthors, 2015: The latmix summer campaign:
+Submesoscale stirring in the upper ocean. *Bulletin of the American
+Meteorological Society*, **96**, 1257–1279,
+<https://doi.org/10.1175/bams-d-14-00015.1>.
 
-Siegelman, L., Klein, P., Rivière, P., Thompson, A. F., Torres, H. S.,
-Flexas, M. and Menemenlis, D.: Enhanced upward heat transport at deep
-submesoscale ocean fronts, Nature Geoscience,
-doi:[10.1038/s41561-019-0489-1](https://doi.org/10.1038/s41561-019-0489-1),
-2019.
+Siegelman, L., P. Klein, P. Rivière, A. F. Thompson, H. S. Torres, M.
+Flexas, and D. Menemenlis, 2019: Enhanced upward heat transport at deep
+submesoscale ocean fronts. *Nature Geoscience*,
+<https://doi.org/10.1038/s41561-019-0489-1>.
 
-Skaret, G., Slotte, A. and Emory Anderson, H. editor: Herring
+Skaret, G., A. Slotte, and H. editor: Emory Anderson, 2017: Herring
 submesoscale dynamics through a major spawning wave: Duration, abundance
-fluctuation, distribution, and schooling, ICES Journal of Marine
-Science, 74(3), 717–727,
-doi:[10.1093/icesjms/fsw180](https://doi.org/10.1093/icesjms/fsw180),
-2017.
+fluctuation, distribution, and schooling. *ICES Journal of Marine
+Science*, **74**, 717–727, <https://doi.org/10.1093/icesjms/fsw180>.
 
-Spiro Jaeger, G. and Mahadevan, A.: Submesoscale-selective compensation
-of fronts in a salinity-stratified ocean, Science Advances, 4(2),
-e1701504,
-doi:[10.1126/sciadv.1701504](https://doi.org/10.1126/sciadv.1701504),
-2018.
+Spiro Jaeger, G., and A. Mahadevan, 2018: Submesoscale-selective
+compensation of fronts in a salinity-stratified ocean. *Science
+Advances*, **4**, e1701504, <https://doi.org/10.1126/sciadv.1701504>.
 
-Tapia, F. J., Navarrete, S. A., Castillo, M., Menge, B. A., Castilla, J.
-C., Largier, J., Wieters, E. A., Broitman, B. L. and Barth, J. A.:
-Thermal indices of upwelling effects on inner-shelf habitats, Progress
-in Oceanography, 83(1), 278–287,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.035](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.035),
-2009.
+Tapia, F. J. and Coauthors, 2009: Thermal indices of upwelling effects
+on inner-shelf habitats. *Progress in Oceanography*, **83**, 278–287,
+<https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.035>.
 
-Thiaw, M., Gascuel, D., Jouffre, D. and Thiaw, O. T.: A surplus
+Thiaw, M., D. Gascuel, D. Jouffre, and O. T. Thiaw, 2009: A surplus
 production model including environmental effects: Application to the
-senegalese white shrimp stocks, Progress in Oceanography, 83(1),
-351–360,
-doi:[https://doi.org/10.1016/j.pocean.2009.07.024](https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.024),
-2009.
+senegalese white shrimp stocks. *Progress in Oceanography*, **83**,
+351–360, <https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.024>.
 
-Thomas, L. N., Tandon, A. and Mahadevan, A.: Submesoscale processes and
-dynamics, Geophysical Monograph Series, 17–38,
-doi:[10.1029/177gm04](https://doi.org/10.1029/177gm04), 2008.
+Thomas, L. N., A. Tandon, and A. Mahadevan, 2008a: Submesoscale
+processes and dynamics. *Geophysical Monograph Series*, 17–38,
+<https://doi.org/10.1029/177gm04>.
 
-Thompson, A. F., Lazar, A., Buckingham, C., Naveira Garabato, A. C.,
-Damerell, G. M. and Heywood, K. J.: Open-ocean submesoscale motions: A
-full seasonal cycle of mixed layer instabilities from gliders, Journal
-of Physical Oceanography, 46(4), 1285–1307,
-doi:[10.1175/jpo-d-15-0170.1](https://doi.org/10.1175/jpo-d-15-0170.1),
-2016.
+——, ——, and ——, 2008b: Submesoscale processes and dynamics. *Geophysical
+Monograph Series*, 17–38, <https://doi.org/10.1029/177gm04>.
 
-Thomsen, S., Kanzow, T., Colas, F., Echevin, V., Krahmann, G. and Engel,
-A.: Do submesoscale frontal processes ventilate the oxygen minimum zone
-off peru?, Geophysical Research Letters, 43(15), 8133–8142,
-doi:[10.1002/2016gl070548](https://doi.org/10.1002/2016gl070548), 2016.
+Thompson, A. F., A. Lazar, C. Buckingham, A. C. Naveira Garabato, G. M.
+Damerell, and K. J. Heywood, 2016: Open-ocean submesoscale motions: A
+full seasonal cycle of mixed layer instabilities from gliders. *Journal
+of Physical Oceanography*, **46**, 1285–1307,
+<https://doi.org/10.1175/jpo-d-15-0170.1>.
 
-Tonani, M., Balmaseda, M., Bertino, L., Blockley, E., Brassington, G.,
-Davidson, F., Drillet, Y., Hogan, P., Kuragano, T., Lee, T. and al.:
-Status and future of global and regional ocean prediction systems,
-Journal of Operational Oceanography, 8(sup2), s201–s220,
-doi:[10.1080/1755876x.2015.1049892](https://doi.org/10.1080/1755876x.2015.1049892),
-2015.
+Thomsen, S., T. Kanzow, F. Colas, V. Echevin, G. Krahmann, and A. Engel,
+2016: Do submesoscale frontal processes ventilate the oxygen minimum
+zone off peru? *Geophysical Research Letters*, **43**, 8133–8142,
+<https://doi.org/10.1002/2016gl070548>.
 
-Trotta, F., Pinardi, N., Fenu, E., Grandi, A. and Lyubartsev, V.:
+Tonani, M. and Coauthors, 2015: Status and future of global and regional
+ocean prediction systems. *Journal of Operational Oceanography*, **8**,
+s201–s220, <https://doi.org/10.1080/1755876x.2015.1049892>.
+
+Trotta, F., N. Pinardi, E. Fenu, A. Grandi, and V. Lyubartsev, 2017:
 Multi-nest high-resolution model of submesoscale circulation features in
-the gulf of taranto, Ocean Dynamics, 67(12), 1609–1625,
-doi:[10.1007/s10236-017-1110-z](https://doi.org/10.1007/s10236-017-1110-z),
-2017.
+the gulf of taranto. *Ocean Dynamics*, **67**, 1609–1625,
+<https://doi.org/10.1007/s10236-017-1110-z>.
 
-Väli, G., Zhurbas, V., Lips, U. and Laanemets, J.: Submesoscale
+Väli, G., V. Zhurbas, U. Lips, and J. Laanemets, 2017: Submesoscale
 structures related to upwelling events in the gulf of finland, baltic
-sea (numerical experiments), Journal of Marine Systems, 171, 31–42,
-doi:[10.1016/j.jmarsys.2016.06.010](https://doi.org/10.1016/j.jmarsys.2016.06.010),
-2017.
+sea (numerical experiments). *Journal of Marine Systems*, **171**,
+31–42, <https://doi.org/10.1016/j.jmarsys.2016.06.010>.
 
-Verma, V., Pham, H. T. and Sarkar, S.: The submesoscale, the finescale
-and their interaction at a mixed layer front, Ocean Modelling, 140,
-101400,
-doi:[10.1016/j.ocemod.2019.05.004](https://doi.org/10.1016/j.ocemod.2019.05.004),
-2019.
+Verma, V., H. T. Pham, and S. Sarkar, 2019: The submesoscale, the
+finescale and their interaction at a mixed layer front. *Ocean
+Modelling*, **140**, 101400,
+<https://doi.org/10.1016/j.ocemod.2019.05.004>.
 
-von Appen, W.-J., Wekerle, C., Hehemann, L., Schourup-Kristensen, V.,
-Konrad, C. and Iversen, M. H.: Observations of a submesoscale cyclonic
-filament in the marginal ice zone, Geophysical Research Letters, 45(12),
-6141–6149,
-doi:[10.1029/2018gl077897](https://doi.org/10.1029/2018gl077897), 2018.
+von Appen, W.-J., C. Wekerle, L. Hehemann, V. Schourup-Kristensen, C.
+Konrad, and M. H. Iversen, 2018: Observations of a submesoscale cyclonic
+filament in the marginal ice zone. *Geophysical Research Letters*,
+**45**, 6141–6149, <https://doi.org/10.1029/2018gl077897>.
 
-Weber, J. E.: Symmetric instability of stratified geostrophic flow,
-Tellus, 32(2), 176–185,
-doi:[10.3402/tellusa.v32i2.10492](https://doi.org/10.3402/tellusa.v32i2.10492),
-1980.
+Weber, J. E., 1980: Symmetric instability of stratified geostrophic
+flow. *Tellus*, **32**, 176–185,
+<https://doi.org/10.3402/tellusa.v32i2.10492>.
 
-Xiu, P., Chai, F., Curchitser, E. N. and Castruccio, F. S.: Future
+Xiu, P., F. Chai, E. N. Curchitser, and F. S. Castruccio, 2018: Future
 changes in coastal upwelling ecosystems with global warming: The case of
-the california current system, Scientific Reports, 8(1),
-doi:[10.1038/s41598-018-21247-7](https://doi.org/10.1038/s41598-018-21247-7),
-2018.
+the california current system. *Scientific Reports*, **8**,
+<https://doi.org/10.1038/s41598-018-21247-7>.
 
-Zheng, Q.: Satellite sar detection of sub-mesoscale ocean dynamic
-processes, WORLD SCIENTIFIC., 2017.
+Zheng, Q., 2017: *Satellite sar detection of sub-mesoscale ocean dynamic
+processes*. WORLD SCIENTIFIC,
 
-Zheng, Q., Lin, H., Meng, J., Hu, X., Song, Y. T., Zhang, Y. and Li, C.:
-Sub-mesoscale ocean vortex trains in the luzon strait, Journal of
-Geophysical Research, 113(C4),
-doi:[10.1029/2007jc004362](https://doi.org/10.1029/2007jc004362), 2008.
+——, H. Lin, J. Meng, X. Hu, Y. T. Song, Y. Zhang, and C. Li, 2008:
+Sub-mesoscale ocean vortex trains in the luzon strait. *Journal of
+Geophysical Research*, **113**, <https://doi.org/10.1029/2007jc004362>.
