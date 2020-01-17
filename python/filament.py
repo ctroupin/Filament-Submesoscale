@@ -440,27 +440,27 @@ class Wind(object):
                     self.lon = self.lon[goodlon]
                     self.lat = self.lat[goodlat]
 
-                self.uwind = np.empty((len(self.lat), len(self.lon), 12))
+                self.u = np.empty((len(self.lat), len(self.lon), 12))
                 windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
                 for i in range(0, 12):
-                    if coordinates is not None:
-                        self.uwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                    if domain is not None:
+                        self.u[:,:,i] = windstress_vars[i][goodlat, goodlon]
                     else:
-                        self.uwind[:,:,i] = windstress_vars[i][:, :]
-            self.uwind = np.ma.masked_where(self.uwind==-9999.0, self.uwind)
+                        self.u[:,:,i] = windstress_vars[i][:, :]
+            self.u = np.ma.masked_where(self.u==-9999.0, self.u)
 
 
         if os.path.exists(vfile):
             with netCDF4.Dataset(vfile, "r") as nc:
 
-                self.vwind = np.empty((len(self.lat), len(self.lon), 12))
+                self.v = np.empty((len(self.lat), len(self.lon), 12))
                 windstress_vars = nc.get_variables_by_attributes(units="N/m^2")
                 for i in range(0, 12):
                     if domain is not None:
-                        self.vwind[:,:,i] = windstress_vars[i][goodlat, goodlon]
+                        self.v[:,:,i] = windstress_vars[i][goodlat, goodlon]
                     else:
-                        self.vwind[:,:,i] = windstress_vars[i][:, :]
-            self.vwind = np.ma.masked_where(self.vwind==-9999.0, self.vwind)
+                        self.v[:,:,i] = windstress_vars[i][:, :]
+            self.v = np.ma.masked_where(self.v==-9999.0, self.v)
 
 
     def read_ascat(self, dataurl, domain=[-180., 180., -90., 90.]):
