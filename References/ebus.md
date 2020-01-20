@@ -99,6 +99,11 @@ Hutchings, L. and Coauthors, 2009: The benguela current: An ecosystem of
 four components. *Progress in Oceanography*, **83**, 15–32,
 <https://doi.org/10.1016/j.pocean.2009.07.046>.
 
+Kämpf, J., and P. Chapman, 2016: The canary/iberia current upwelling
+system. *Upwelling systems of the world: A scientific journey to the
+most productive marine ecosystems*, Springer International Publishing,
+203–250.
+
 Messié, M., J. Ledesma, D. D. Kolber, R. P. Michisaki, D. G. Foley, and
 F. P. Chavez, 2009: Potential new production estimates in four eastern
 boundary upwelling ecosystems. *Progress in Oceanography*, **83**,
