@@ -246,6 +246,11 @@ to the long-range offshore transport of organic carbon from the canary
 upwelling system to the open north atlantic. *Biogeosciences*, **15**,
 5061–5091, <https://doi.org/10.5194/bg-15-5061-2018>.
 
+Mahadevan, A., A. Tandon, and R. Ferrari, 2010: Rapid changes in mixed
+layer stratification driven by submesoscale instabilities and winds.
+*Journal of Geophysical Research*, **115**,
+<https://doi.org/10.1029/2008jc005203>.
+
 Marchesiello, P., X. Capet, C. Menkes, and S. C. Kennan, 2011:
 Submesoscale dynamics in tropical instability waves. *Ocean Modelling*,
 **39**, 31–46, <https://doi.org/10.1016/j.ocemod.2011.04.011>.
@@ -263,6 +268,11 @@ of the california undercurrent. *Journal of Physical Oceanography*,
 Nikurashin, M., G. K. Vallis, and A. Adcroft, 2012: Routes to energy
 dissipation for geostrophic flows in the southern ocean. *Nature
 Geoscience*, **6**, 48–51, <https://doi.org/10.1038/ngeo1657>.
+
+Omand, M. M., E. A. D’Asaro, C. M. Lee, M. J. Perry, N. Briggs, I.
+Cetini, and A. Mahadevan, 2015: Eddy-driven subduction exports
+particulate organic carbon from the spring bloom. *Science*, **348**,
+222–225, <https://doi.org/10.1126/science.1260062>.
 
 Omta, A. W., B. Kooijman, and H. Dijkstra, 2007: Influence of
 (sub)mesoscale eddies on the soft-tissue carbon pump. *Journal of
@@ -301,6 +311,10 @@ Submesoscale impacts on mesoscale agulhas dynamics. *Journal of Advances
 in Modeling Earth Systems*, **11**, 2745–2767,
 <https://doi.org/10.1029/2019ms001724>.
 
+Shao, M. and Coauthors, 2019: The variability of winds and fluxes
+observed near submesoscale fronts. *Journal of Geophysical Research:
+Oceans*, **124**, 7756–7780, <https://doi.org/10.1029/2019jc015236>.
+
 Shcherbina, A. Y. and Coauthors, 2015: The latmix summer campaign:
 Submesoscale stirring in the upper ocean. *Bulletin of the American
 Meteorological Society*, **96**, 1257–1279,
@@ -329,12 +343,9 @@ production model including environmental effects: Application to the
 senegalese white shrimp stocks. *Progress in Oceanography*, **83**,
 351–360, <https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.024>.
 
-Thomas, L. N., A. Tandon, and A. Mahadevan, 2008a: Submesoscale
-processes and dynamics. *Geophysical Monograph Series*, 17–38,
+Thomas, L. N., A. Tandon, and A. Mahadevan, 2008: Submesoscale processes
+and dynamics. *Geophysical Monograph Series*, 17–38,
 <https://doi.org/10.1029/177gm04>.
-
-——, ——, and ——, 2008b: Submesoscale processes and dynamics. *Geophysical
-Monograph Series*, 17–38, <https://doi.org/10.1029/177gm04>.
 
 Thompson, A. F., A. Lazar, C. Buckingham, A. C. Naveira Garabato, G. M.
 Damerell, and K. J. Heywood, 2016: Open-ocean submesoscale motions: A

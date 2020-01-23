@@ -152,6 +152,10 @@ variability in chlorophyll concentrations in the humboldt and california
 current systems. *Progress in Oceanography*, **83**, 386–392,
 <https://doi.org/https://doi.org/10.1016/j.pocean.2009.07.020>.
 
+Todd, R. E. and Coauthors, 2019: Global perspectives on observing ocean
+boundary current systems. *Frontiers in Marine Science*, **6**,
+<https://doi.org/10.3389/fmars.2019.00423>.
+
 Veitch, J., P. Penven, and F. Shillington, 2009: The benguela: A
 laboratory for comparative modeling studies. *Progress in Oceanography*,
 **83**, 296–302,
