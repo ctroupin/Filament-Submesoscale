@@ -10,7 +10,9 @@ from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
+import matplotlib.patheffects as PathEffects
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from geopy.distance import vincenty
 import cmocean
 import scipy.io as sio
@@ -516,7 +518,7 @@ class Wind(object):
         return res
 
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
-                    clim=[0, 15], date=None, vis=False,
+                    date=None, vis=False, clim=[0., 15.], quivscale=200, quivwidth=0.2,
                     cbarloc=[0.18, 0.75, 0.2, 0.015]):
         """
         ```python
@@ -533,6 +535,9 @@ class Wind(object):
         clim: limits of the colorbar
         date: the date to be added to the plot
         """
+        
+        axins1 = inset_axes(ax, width="35%", height="3.5%", loc='lower right', borderpad=4)    
+        axins1.xaxis.set_ticks_position("bottom")
 
         if date is not None:
             plt.text(0.05, 0.95, date, size=18, rotation=0.,
@@ -545,7 +550,7 @@ class Wind(object):
                                )
                      )
         qv = ax.quiver(self.lon, self.lat, self.u, self.v, self.speed,
-                       scale=400, width=.002, cmap=cmap, clim=clim)
+                       scale=quivscale, width=quivwidth, cmap=cmap, clim=clim)
 
         if domain is not None:
             ax.set_xlim(domain[0], domain[1])
@@ -555,7 +560,7 @@ class Wind(object):
         #ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
         #                layers=['coastlines'])
 
-        cbar_ax = fig.add_axes(cbarloc)
+
         if clim[0] == 0.:
             ext = "max"
         else:
@@ -563,14 +568,19 @@ class Wind(object):
 
         if vis is True:
             textcolor = "w"
+            backcolor = "k"
         else:
             textcolor = "k"
-        cb = plt.colorbar(qv, orientation="horizontal", cax=cbar_ax, extend=ext)
+            backcolor = "w"
+                        
+        cb = plt.colorbar(qv, cax=axins1, extend=ext, orientation="horizontal")
         cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=12,
-                     color=textcolor)
+                     color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
+                                                        foreground=backcolor)])
         cb.ax.xaxis.set_tick_params(color=textcolor)
         cb.outline.set_edgecolor(textcolor)
-        plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
+        plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
+                                                        foreground=backcolor)])
 
 class Visible(object):
 
