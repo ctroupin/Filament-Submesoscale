@@ -362,6 +362,46 @@ class SST(object):
                               np.flipud(self.lat[0,:].compressed())))
         return lonrect, latrect
 
+class Chloro(object):
+    """
+    Chlorophyll concentration
+    """
+
+    def __init__(self, lon=None, lat=None, field=None, qflag=None,
+                 year=None, dayofyear=None, date=None):
+        self.lon = lon
+        self.lat = lat
+        self.field = field
+        self.qflag = qflag
+        self.timeunits = year
+        self.year = year
+        self.dayofyear = dayofyear
+        self.date = date
+
+    def read_from_oceancolorL2(self, filename):
+        """
+        Load the SST from netCDF L2 file obtained from
+        https://oceancolor.gsfc.nasa.gov
+        :param filename: name of the netCDF file
+        :return: lon, lat, field, qflag, year, dayofyear
+        """
+
+        if os.path.exists(filename):
+            with netCDF4.Dataset(filename) as nc:
+                # Read platform
+                sat = nc.platform
+                # Read time information
+                # Assume all the measurements made the same day (and same year)
+                self.year = int(nc.groups['scan_line_attributes'].variables['year'][0])
+                self.dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
+                # Convert to date
+                self.date = datetime.datetime(self.year, 1, 1) + datetime.timedelta(self.dayofyear - 1)
+                # Read coordinates
+                self.lon = nc.groups['navigation_data'].variables['longitude'][:]
+                self.lat = nc.groups['navigation_data'].variables['latitude'][:]
+                # Read geophysical variables
+                self.field = nc.groups['geophysical_data'].variables['chlor_a'][:]
+
 
 class Swot(object):
     def __init__(self, lon=None, lat=None, rad=None):
