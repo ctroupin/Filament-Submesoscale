@@ -6,7 +6,7 @@ Python tools to read and process oceanographic data related to upwelling filamen
 
 ### NAO
 
-https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii
+[NCEP](https://www.cpc.ncep.noaa.gov/products/precip/CWlink/pna/norm.nao.monthly.b5001.current.ascii)
 [downloaded July 5, 2019]
 
 https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nao.long.data
@@ -16,7 +16,7 @@ https://climatedataguide.ucar.edu/sites/default/files/nao_station_monthly.txt
 [downloaded July 5, 2019]
 
 
-North Atlantic SST Anomalies and the Cold North European Weather Events of Winter 2009/10 and December 2010 
+North Atlantic SST Anomalies and the Cold North European Weather Events of Winter 2009/10 and December 2010
 https://journals.ametsoc.org/doi/full/10.1175/MWR-D-13-00104.1
 
 Understanding the contrasting North Atlantic Oscillation anomalies of the winters of 2010 and 2014
