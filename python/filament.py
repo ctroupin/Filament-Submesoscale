@@ -89,7 +89,9 @@ class SST(object):
                 year = int(nc.groups['scan_line_attributes'].variables['year'][0])
                 dayofyear = int(nc.groups['scan_line_attributes'].variables['day'][0])
                 # Convert to date
-                self.date = datetime.datetime(year, 1, 1) + datetime.timedelta(dayofyear - 1)
+                #self.date = datetime.datetime(year, 1, 1) + datetime.timedelta(dayofyear - 1)
+                tstring = nc.time_coverage_start
+                self.date = datetime.datetime.strptime(tstring, '%Y-%m-%dT%H:%M:%S.%fZ')
                 # Read coordinates
                 self.lon = nc.groups['navigation_data'].variables['longitude'][:]
                 self.lat = nc.groups['navigation_data'].variables['latitude'][:]
@@ -98,8 +100,15 @@ class SST(object):
                     self.field = nc.groups['geophysical_data'].variables['sst'][:]
                     self.qflag = nc.groups['geophysical_data'].variables['qual_sst'][:]
                 except KeyError:
-                    self.field = nc.groups['geophysical_data'].variables['sst4'][:]
-                    self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
+                    try:
+                        self.field = nc.groups['geophysical_data'].variables['sst4'][:]
+                        self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
+                    except KeyError:
+                        self.field = nc.groups['geophysical_data'].variables['sst_triple']
+                        try:
+                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst']
+                        except KeyError:
+                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst_triple']
 
     def read_from_ghrsst(self, filename):
         """
@@ -149,7 +158,7 @@ class SST(object):
         return figname
 
     def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.thermal,
-                    clim=[15., 30.], date=None, vis=False,
+                    clim=[15., 30.], vis=False,
                     cbarloc=[0.18, 0.75, 0.2, 0.015]):
         """
         ```python
@@ -166,17 +175,16 @@ class SST(object):
         date: the date to be added to the plot
         """
 
-        if date is not None:
-            plt.text(0.15, 0.95, date, size=18, rotation=0.,
-                     ha="center", va="center",
-                     transform=ax.transAxes,
-                     bbox=dict(boxstyle="round",
-                               ec=(1., 0.5, 0.5),
-                               fc=(1., 1., 1.),
-                               alpha=.7
-                               )
-                     )
-        pcm = ax.pcolormesh(self.lon, self.lat, self.field, cmap=cmap,
+        plt.text(0.05, 0.95, self.date.strftime('%Y-%m-%d %H:%M:%S'), size=18, rotation=0.,
+                 ha="left", va="center",
+                 transform=ax.transAxes,
+                 bbox=dict(boxstyle="round",
+                           ec=(1., 0.5, 0.5),
+                           fc=(1., 1., 1.),
+                           alpha=.7
+                           )
+                 )
+        pcm = ax.pcolormesh(self.lon.data, self.lat.data, self.field, cmap=cmap,
                             vmin=clim[0], vmax=clim[1])
 
         if domain is not None:
@@ -519,7 +527,7 @@ class Wind(object):
 
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
                     date=None, vis=False, clim=[0., 15.], quivscale=200, quivwidth=0.2,
-                    cbarloc=[0.18, 0.75, 0.2, 0.015]):
+                    cbarloc='lower right', cbarplot=True):
         """
         ```python
         wind.add_to_plot(fig, ax, domain, cmap, clim=[0, 15], date)
@@ -535,13 +543,10 @@ class Wind(object):
         clim: limits of the colorbar
         date: the date to be added to the plot
         """
-        
-        axins1 = inset_axes(ax, width="35%", height="3.5%", loc='lower right', borderpad=4)    
-        axins1.xaxis.set_ticks_position("bottom")
 
         if date is not None:
             plt.text(0.05, 0.95, date, size=18, rotation=0.,
-                     ha="left", va="center",
+                     ha="left", va="top",
                      transform=ax.transAxes,
                      bbox=dict(boxstyle="round",
                                ec=(1., 0.5, 0.5),
@@ -572,15 +577,17 @@ class Wind(object):
         else:
             textcolor = "k"
             backcolor = "w"
-                        
-        cb = plt.colorbar(qv, cax=axins1, extend=ext, orientation="horizontal")
-        cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=12,
+
+        if cbarplot is True:
+            axins1 = inset_axes(ax, width="35%", height="3.5%", loc=cbarloc, borderpad=4)
+            axins1.xaxis.set_ticks_position("bottom")
+            cb = plt.colorbar(qv, cax=axins1, extend=ext, orientation="horizontal")
+            cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=12,
                      color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
                                                         foreground=backcolor)])
-        cb.ax.xaxis.set_tick_params(color=textcolor)
-        cb.outline.set_edgecolor(textcolor)
-        plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
-                                                        foreground=backcolor)])
+            cb.ax.xaxis.set_tick_params(color=textcolor)
+            cb.outline.set_edgecolor(textcolor)
+            plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1, foreground=backcolor)])
 
 class Visible(object):
 
@@ -1047,3 +1054,17 @@ def get_filelist_url_quikscat(year, dayofyear):
     logger.info("Found {} files".format(len(urllist)))
 
     return urllist
+
+def extract_emodnet_bath(bathfile, domain):
+    """
+    Extract the bathymetry from a tile (in netCDF) downloaded from EMODnet Bathymetry format
+    """
+    with netCDF4.Dataset(bathfile) as nc:
+        lon = nc.get_variables_by_attributes(standard_name="projection_x_coordinate")[0][:]
+        lat = nc.get_variables_by_attributes(standard_name="projection_y_coordinate")[0][:]
+        goodlon = np.where((lon <= domain[1]) & (lon >= domain[0]))[0]
+        goodlat = np.where((lat <= domain[3]) & (lat >= domain[2]))[0]
+        lon = lon[goodlon]
+        lat = lat[goodlat]
+        depth = nc.variables["DEPTH"][goodlat, goodlon]
+    return lon, lat, depth
