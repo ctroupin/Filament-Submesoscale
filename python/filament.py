@@ -35,6 +35,40 @@ logger = logging.getLogger("Filament")
 
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
+
+class Bathymetry(object):
+    """
+    Bathymetry/tropography
+    """
+
+    def __init__(self, lon=None, lat=None, depth=None):
+        self.lon = lon
+        self.lat = lat
+        self.depth = depth
+
+    def read_from_EMODnet_dtm(self, fname, domain=None):
+        """
+        Extract the bathymetry from the .dtm (tile) file downloaded from EMODnet bathymetry
+        If `domain` is defined, it defined the bounding box in which the bathymetry is extracted
+        """
+        with netCDF4.Dataset(fname) as nc:
+            lon = nc.get_variables_by_attributes(standard_name="projection_x_coordinate")[0][:]
+            lat = nc.get_variables_by_attributes(standard_name="projection_y_coordinate")[0][:]
+            if domain is not None:
+                if len(domain) == 4:
+                    goodlon = np.where((lon <= domain[1]) & (lon >= domain[0]))[0]
+                    goodlat = np.where((lat <= domain[3]) & (lat >= domain[2]))[0]
+                    self.lon = lon[goodlon]
+                    self.lat = lat[goodlat]
+                    self.depth = nc.variables["DEPTH"][goodlat, goodlon]
+                else:
+                    logger.error("domain, if defined, should be a 4-element tuple")
+            else:
+                self.lon = lon
+                self.lat = lat
+                self.depth = nc.variables["DEPTH"][:]
+
+
 class SST(object):
     """
     Sea surface temperature field
@@ -315,6 +349,18 @@ class SST(object):
             plt.savefig(figname, dpi=300, bbox_inches="tight")
         # plt.show()
         plt.close()
+
+
+    def get_domain(self):
+        lonrect = np.concatenate((self.lon[:,0].compressed(),
+                              self.lon[-1,:].compressed(),
+                              np.flipud(self.lon[:,-1].compressed()),
+                              np.flipud(self.lon[0,:].compressed())))
+        latrect = np.concatenate((self.lat[:,0].compressed(),
+                              self.lat[-1,:].compressed(),
+                              np.flipud(self.lat[:,-1].compressed()),
+                              np.flipud(self.lat[0,:].compressed())))
+        return lonrect, latrect
 
 
 class Swot(object):
