@@ -1,3 +1,4 @@
+tests/data/
 ./tests/data/*
 
 # Byte-compiled / optimized / DLL files
