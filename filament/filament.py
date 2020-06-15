@@ -126,9 +126,11 @@ class SST(object):
                 #self.date = datetime.datetime(year, 1, 1) + datetime.timedelta(dayofyear - 1)
                 tstring = nc.time_coverage_start
                 self.date = datetime.datetime.strptime(tstring, '%Y-%m-%dT%H:%M:%S.%fZ')
+
                 # Read coordinates
                 self.lon = nc.groups['navigation_data'].variables['longitude'][:]
                 self.lat = nc.groups['navigation_data'].variables['latitude'][:]
+
                 # Read geophysical variables
                 try:
                     self.field = nc.groups['geophysical_data'].variables['sst'][:]
@@ -138,11 +140,21 @@ class SST(object):
                         self.field = nc.groups['geophysical_data'].variables['sst4'][:]
                         self.qflag = nc.groups['geophysical_data'].variables['qual_sst4'][:]
                     except KeyError:
-                        self.field = nc.groups['geophysical_data'].variables['sst_triple']
+                        self.field = nc.groups['geophysical_data'].variables['sst_triple'][:]
                         try:
-                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst']
+                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst'][:]
                         except KeyError:
-                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst_triple']
+                            self.qflag = nc.groups['geophysical_data'].variables['qual_sst_triple'][:]
+
+                # Remove bad coordinates (for plotting purposes)
+                if np.ma.is_masked(self.lon):
+                    lon0 = self.lon[:,0]
+                    goodlon = ~lon0.mask
+                    self.lon = self.lon[goodlon, :]
+                    self.lat = self.lat[goodlon, :]
+                    self.field = self.field[goodlon, :]
+                    self.qflag = self.qflag[goodlon, :]
+
 
     def read_from_ghrsst(self, filename):
         """
@@ -161,6 +173,19 @@ class SST(object):
                 self.lat = nc.variables["lat"][:]
                 self.field = nc.variables["sea_surface_temperature"][0,:,:] - 273.15
                 self.qflag = nc.variables["quality_level"][0,:,:]
+
+    def read_from_cmems(self, datafile, tindex):
+        """
+        Extract the surface temperature from CMEMS-IBI regional model
+        at the time index `tindex`
+        """
+        with netCDF4.Dataset(datafile, "r") as nc:
+            self.lon = nc.variables["longitude"][:]
+            self.lat = nc.variables["latitude"][:]
+            time = nc.variables["time"][tindex]
+            timeunits = nc.variables["time"].units
+            self.date = netCDF4.num2date(time, timeunits)
+            self.field = nc.get_variables_by_attributes(standard_name='sea_water_potential_temperature')[0][tindex,:,:]
 
     def apply_qc(self, qf=1):
         """
@@ -191,9 +216,23 @@ class SST(object):
         figname = figname.replace(".", "-")
         return figname
 
+    def add_date(self, ax):
+        """
+        Add a box with the date inside
+        """
+        plt.text(0.05, 0.95, self.date.strftime('%Y-%m-%d %H:%M:%S'), size=18, rotation=0.,
+             ha="left", va="center",
+             transform=ax.transAxes,
+             bbox=dict(boxstyle="round",
+                       ec=(1., 0.5, 0.5),
+                       fc=(1., 1., 1.),
+                       alpha=.7
+                       )
+             )
+
     def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.thermal,
                     clim=[15., 30.], vis=False,
-                    cbarloc=[0.18, 0.75, 0.2, 0.015]):
+                    cbarloc=[0.18, 0.75, 0.2, 0.015], alpha=1):
         """
         ```python
         sst.add_to_plot(fig, ax, domain, cmap, clim, date)
@@ -209,17 +248,8 @@ class SST(object):
         date: the date to be added to the plot
         """
 
-        plt.text(0.05, 0.95, self.date.strftime('%Y-%m-%d %H:%M:%S'), size=18, rotation=0.,
-                 ha="left", va="center",
-                 transform=ax.transAxes,
-                 bbox=dict(boxstyle="round",
-                           ec=(1., 0.5, 0.5),
-                           fc=(1., 1., 1.),
-                           alpha=.7
-                           )
-                 )
         pcm = ax.pcolormesh(self.lon.data, self.lat.data, self.field, cmap=cmap,
-                            vmin=clim[0], vmax=clim[1])
+                            vmin=clim[0], vmax=clim[1], alpha=alpha)
 
         if domain is not None:
             ax.set_xlim(domain[0], domain[1])
@@ -236,6 +266,7 @@ class SST(object):
         cb.ax.xaxis.set_tick_params(color=textcolor)
         cb.outline.set_edgecolor(textcolor)
         plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
+        return pcm, cb
 
     def make_plot(self, m, figname=None, visibleim=None, swot=None, titletext=None,
                   vmin=16., vmax=24., shrink=1.):
