@@ -4,6 +4,7 @@ import logging
 import datetime
 import numpy as np
 import seawater
+import calendar
 from osgeo import gdal
 from osgeo import osr
 from scipy import interpolate
@@ -48,8 +49,10 @@ class Bathymetry(object):
 
     def read_from_EMODnet_dtm(self, fname, domain=None):
         """
-        Extract the bathymetry from the .dtm (tile) file downloaded from EMODnet bathymetry
-        If `domain` is defined, it defined the bounding box in which the bathymetry is extracted
+        Extract the bathymetry from the `.dtm` (tile) file downloaded from
+        [EMODnet Bathymetry]()
+        If `domain` is defined, the bathymetry is extracted in the domain
+        defined the bounding box `domain` (lonmin, lonmax, latmin, latmax)
         """
         with netCDF4.Dataset(fname) as nc:
             lon = nc.get_variables_by_attributes(standard_name="projection_x_coordinate")[0][:]
@@ -85,10 +88,9 @@ class SST(object):
 
     def read_from_oceancolorL3(self, filename, domain=(-180., 180., -90., 90.)):
         """
-        Read the coordinates and the SST from a L3 file
+        Read the coordinates and the SST from an Ocean Color level-3 file
         and subset the domain defined by `coordinates`
-        If coordinates are not specified, then the whole domain
-        is considered
+        If coordinates are not specified, then the whole domain is considered
         """
         with netCDF4.Dataset(filename) as nc:
             self.fname = filename
@@ -159,7 +161,7 @@ class SST(object):
     def read_from_ghrsst(self, filename):
         """
         Load the SST from netCDF GHRSST file obtained from
-        ftp://podaac-ftp.jpl.nasa.gov
+        [PODAAC FTP](ftp://podaac-ftp.jpl.nasa.gov)
         :param filename: name of the netCDF file
         :return: lon, lat, field, qflag, year, dayofyear
         """
@@ -312,6 +314,9 @@ class SST(object):
         plt.close()
 
     def make_plot_qf(self, m, figname=None, titletext=None, shrink=1.):
+        """
+        Create a plot with the Quality Flag values
+        """
         fig = plt.figure(figsize=(8, 8))
         ax = plt.subplot(111)
 
@@ -342,7 +347,8 @@ class SST(object):
         plt.close()
 
 
-    def make_plot2(self, m, figname=None, visibleim=None, swot=None, titletext=None, vmin=16., vmax=24.):
+    def make_plot2(self, m, figname=None, visibleim=None, swot=None,
+                   titletext=None, vmin=16., vmax=24.):
         """
         Make the plot of the SST on a map
         Input:
@@ -383,6 +389,10 @@ class SST(object):
 
 
     def get_domain(self):
+        """
+        Create a rectangle defined by (lonrect, latrect) based on the SST
+        coordinates (mostly for plotting purposes)
+        """
         lonrect = np.concatenate((self.lon[:,0].compressed(),
                               self.lon[-1,:].compressed(),
                               np.flipud(self.lon[:,-1].compressed()),
@@ -411,8 +421,8 @@ class Chloro(object):
 
     def read_from_oceancolorL2(self, filename):
         """
-        Load the SST from netCDF L2 file obtained from
-        https://oceancolor.gsfc.nasa.gov
+        Load the chlorophyll concentration from netCDF level-2 file
+        obtained from [Ocean Color](https://oceancolor.gsfc.nasa.gov)
         :param filename: name of the netCDF file
         :return: lon, lat, field, qflag, year, dayofyear
         """
@@ -449,6 +459,10 @@ class Swot(object):
             self.lon[self.lon>180.] = self.lon[self.lon>180.] - 360.
 
     def select_domain(self, coordinates):
+        """
+        Subset the coordinates in a region of interest defined by the
+        tuple `coordinates`
+        """
         goodlon = np.where(np.logical_and(self.lon>= coordinates[0], self.lon<= coordinates[1]))[0]
         goodlat = np.where(np.logical_and(self.lat>= coordinates[2], self.lat<= coordinates[3]))[0]
         goodcoords = np.intersect1d(goodlon, goodlat)
@@ -1185,3 +1199,62 @@ def extract_emodnet_bath(bathfile, domain):
         lat = lat[goodlat]
         depth = nc.variables["DEPTH"][goodlat, goodlon]
     return lon, lat, depth
+
+def get_monthly_filename(sat, sensor, year, month, res="9km"):
+    """
+    Return the file name according to the satellite, sensor and the period of
+    interest, specified by `year` and `month`.
+
+    ```python
+    sstfilename = get_monthly_filename("TERRA", "MODIS", 2020, 6)
+    > "TERRA_MODIS.20200601_20200630.L3m.MO.SST4.sst4.9km.nc"
+    ```
+
+    """
+    mm = str(month).zfill(2)
+    numdays = calendar.monthrange(year, month)[1]
+    nd = str(numdays).zfill(2)
+    fname = f"{sat}_{sensor}.{year}{mm}01_{year}{mm}{nd}.L3m.MO.SST4.sst4.{res}.nc"
+    return fname
+
+def get_monthly_clim_filename(sat, sensor, yearstart, yearend, month, res="9km"):
+    """
+    Return the file name according to the satellite, mission and the date
+
+    ```python
+
+    ```
+
+    """
+    mm = str(month).zfill(2)
+    numdays = calendar.monthrange(yearend, month)[1]
+    ddend = str(numdays).zfill(2)
+    res = "9km"
+    fname = f"{sat}_{sensor}.{yearstart}{mm}01_{yearend}{mm}{ddend}.L3m.MC.SST4.sst4.{res}.nc"
+
+    return fname
+
+def get_filelist_url_oceancolor(sat="MODIS-Terra", res="9km", variable="sst4"):
+    """
+    Generate a list of URLs for the netCDF files from Ocean Color.
+    """
+
+    urllist = []
+
+    baseurl = f"https://oceandata.sci.gsfc.nasa.gov/{sat}/Mapped/Monthly/{res}/{variable}/"
+    logger.info(baseurl)
+    r = requests.get(baseurl)
+    content = r.content
+    soup = BeautifulSoup(content, "html.parser")
+
+    for link in soup.find_all('a'):
+        datalink = link.get('href')
+        if isinstance(datalink, str):
+            if datalink.endswith(".nc"):
+            #if datalink.startswith("ascat_") & datalink.endswith(".gz"):
+            #    dataurl = os.path.join(opendapurl, str(year), str(dayofyear).zfill(3), datalink)
+                urllist.append(datalink)
+
+    #logger.info("Found {} files".format(len(urllist)))
+
+    return urllist
