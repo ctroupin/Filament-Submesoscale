@@ -1,0 +1,112 @@
+\documentclass[11pt,a4paper,svgnames,draft]{beamer}
+\usepackage[orientation=portrait,scale=.9]{beamerposter}
+\usepackage{pgfgantt}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{url}
+\renewcommand\headrulewidth{0pt}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage[skins]{tcolorbox}
+\usepackage{academicons}
+\usepackage{fontawesome}
+\tcbuselibrary{raster}
+
+\DeclareGraphicsExtensions{.pdf,.png,.PNG,.JPG,.jpg,.jpeg,.gif}
+\graphicspath{
+{/data/SST/Global/figures/}
+}
+
+\definecolor{mygrey}{HTML}{2D2D2D}%
+\definecolor{myblue}{HTML}{4367AA}
+\definecolor{myorange}{HTML}{FF900E}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{block body}{fg=white}
+
+
+\newfontfamily\titlefont[Path = /home/ctroupin/.fonts/]{Aileron-Thin}
+\newfontfamily\cloudfont[Path = /home/ctroupin/.fonts/]{Tangerine-Bold.ttf}
+\setbeamerfont{title}{size=\fontsize{160}{50}\selectfont,series=\titlefont}
+
+\newcommand{\montant}{\rule{0pt}{1.5cm}}
+
+\setbeamertemplate{headline}{
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+        \vskip4ex
+        \centering
+        
+\usebeamercolor{title in headline}{\color{bg}\usebeamerfont{title}{\selectfont\inserttitle}\\[1ex]}
+
+  \end{beamercolorbox}
+
+  \vskip2ex
+  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line head}
+    \rule{0pt}{2pt}
+  \end{beamercolorbox}
+}
+
+\newlength{\figwidth}
+\setlength{\figwidth}{20cm}
+
+\setbeamertemplate{navigation symbols}{}
+
+
+\title{Sea Surface Temperature\\ anomalies - 2019}
+
+\begin{document}
+
+\begin{columns}[T]
+\begin{column}{2cm}
+
+\end{column}
+
+\begin{column}{.5\textwidth}
+
+\begin{block}
+\large
+\faInfoCircle~~SST anomalies are computed with respect to the corresponding monthly climatology (2000-2020)\\ 
+\faLink~~Data: MODIS TERRA 4$\mu$ SST (\url{oceancolor.gsfc.nasa.gov/})\\
+\faGithub~~\url{https://github.com/ctroupin/Filament-Submesoscale}\\
+\faWrench~~Python $\bullet$ Matplotlib $\bullet$ \LaTeX\\
+\faCreativeCommons~~Charles Troupin
+
+
+\end{block}
+
+\end{column}
+
+\begin{column}{.5\textwidth}
+
+\begin{figure}
+\centering
+\includegraphics[width=.95\textwidth]{sst_colorbar.png}
+\end{figure}
+\end{column}
+\end{columns}
+
+\begin{tcbitemize}[raster columns=3,raster rows=4,raster height=1.2\linewidth,raster equal height,
+raster every box/.style={size=normal,beamer,colbacktitle=myblue,colframe=myblue,colback=black,center title,fonttitle=\huge\cloudfont,toptitle=2mm,opacitybacktitle=.5}]
+
+\tcbitem[title=January\vphantom{JMly}] \begin{figure}\centering \includegraphics[width=\figwidth]{SSTanomalies_2019_1.png}\end{figure}
+\tcbitem[title=February\vphantom{JMly}]\begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_2.png}\end{figure}
+\tcbitem[title=March\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_3.png}\end{figure}
+	
+\tcbitem[title=April\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_4.png}\end{figure}
+\tcbitem[title=May\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_5.png}\end{figure}
+\tcbitem[title=June\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_6.png}\end{figure}
+
+\tcbitem[title=July\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_7.png} \end{figure}
+\tcbitem[title=August\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_8.png} \end{figure}
+\tcbitem[title=September\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_9.png} \end{figure}
+
+\tcbitem[title=October\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_10.png}\end{figure}
+\tcbitem[title=November\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_11.png} \end{figure}
+\tcbitem[title=December\vphantom{JMly}] \begin{figure}\centering\includegraphics[width=\figwidth]{SSTanomalies_2019_12.png} \end{figure}
+\end{tcbitemize}
+
+
+
+
+\end{document}
