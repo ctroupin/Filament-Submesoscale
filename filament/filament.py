@@ -14,7 +14,7 @@ from matplotlib.path import Path
 import matplotlib.patheffects as PathEffects
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 import cmocean
 import scipy.io as sio
 import warnings
