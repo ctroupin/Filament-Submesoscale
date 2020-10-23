@@ -98,7 +98,7 @@ function read_sst_oceancolor_L3(datafile::String, domain::Array)
 end
 
 """
-    create_sst_file(filename, lons, lats, times, sstanom)
+    create_sst_file(filename, lons, lats, times, sstanom, mask)
 
 Write the coordinates `lons`, `lates`, the times `times` and the SST anomalies
 `sstanom` in the netCDF file `filename`.
@@ -126,7 +126,7 @@ function create_sst_file(filename::String, lons, lats, times, sstanom, mask; val
 
         nctime = defVar(ds,"time", Float32, ("time",))
         nctime.attrib["missing_value"] = Float32(valex)
-        nctime.attrib["units"] = "seconds since 1981-01-01 00:00:00"
+        nctime.attrib["units"] = "days since 1981-01-01 00:00:00"
         nctime.attrib["time"] = "time"
 
         nclon = defVar(ds,"lon", Float32, ("lon",))
@@ -158,6 +158,5 @@ function create_sst_file(filename::String, lons, lats, times, sstanom, mask; val
         nclat[:] = lats;
 
     end
-end;
-
 end
+end;
