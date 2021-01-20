@@ -1,11 +1,12 @@
 \documentclass[final,table,svgnames]{article}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{subcaption}
 \usepackage{hyperref}
 \usepackage[margin=0.15in]{geometry}
 \usepackage{fontspec}
 \setmainfont{Carlito}
+\usepackage[labelfont=bf,justification=centering]{caption}
+\usepackage{subcaption}
 
 
 
@@ -28,15 +29,11 @@ urlcolor=blue}
 
 \defaultfontfeatures{Ligatures=TeX}
 
-   
-% ------------------------------------------------
-% LENGTH DEFINITIONS
-%-------------------------------------------------
-%\setlength{\textwidth}{24cm}
-%\setlength{\textheight}{28cm}
+\setlength{\parskip}{0pt}
+
 
 \DeclareGraphicsExtensions{.eps,.JPG,.jpg,.pdf,.png,.PNG,.jpeg}
-\graphicspath{./figures/}
+\graphicspath{{./MainFig/}}
 
 
 \begin{document}
@@ -44,47 +41,66 @@ urlcolor=blue}
 
 \begin{figure}
 \centering
-\begin{subfigure}[t]{\textwidth}
-\caption{20-year averaged sea-surface temperature and wind vectors in the four Eastern Boundary Current Upwelling Systems.}
-\includegraphics[width=\textwidth]{../figures/SST_wind_summer_2018_07_006.png}
-\end{subfigure}
-
-%\begin{subfigure}[t]{.55\textwidth}
-%\caption{Temporal and spatial scales of oceanic processes.}
-%\includegraphics[width=\textwidth]{../figures/oceanscales.png}
-%\end{subfigure}
-
-%\begin{subfigure}[t]{.5\textwidth}
-%\caption{Mean SST in summer 2018 in the Canary/Iberia upwelling system.}
-%\includegraphics[width=\textwidth]{../figures/SST_summer2018_Canbus.png}
-%\end{subfigure}
-
-\begin{subfigure}[t]{.75\textwidth}
-\caption{SST on January 1, 2020 off Northwest Africa. The coastal upwelling exhibits irregularities and a well-developed filament at 31$^{\circ}$N. Data from VIIRS sensor onboard SNPP satellite}
-\includegraphics[width=\textwidth]{../figures/SNPP_VIIRS-20200101T022400-L2-SST-NRT.png}
-\end{subfigure}
-
+\includegraphics[width=.8\textwidth]{Tanomalies_2020}
+\caption{Temperature anomalies in 2020.~$\bullet$~\textbf{Data source:} GISTEMP v4 (NASA).}
 \end{figure}
 
-\begin{figure}[t]\ContinuedFloat
+
+\begin{figure}
 \centering
-\begin{subfigure}[t]{.75\textwidth}
-\caption{Closer view of the previous figure showing he filament and its complex structure.}
-\includegraphics[width=\textwidth]{../figures/SNPP_VIIRS-20200101T022400-L2-SST-NRT_zoom.png}
+\includegraphics[width=.9\textwidth]{SST_wind_summer_2018_07_006}
+\caption{20-year averaged sea-surface temperature and wind vectors in the four Eastern Boundary Current Upwelling Systems.~$\bullet$~\textbf{Data source:} SST from MODIS/Terra; wind from CCMP.}
+\end{figure}
+
+
+
+
+\begin{figure}
+\centering
+\includegraphics[width=.475\textwidth]{choro_MODIS_Terra4.jpg}
+\caption{20-year averaged chlorophyll-a concentration.~$\bullet$~\textbf{Data source:} MODIS Terra}
+\end{figure}
+
+
+\begin{figure}
+\centering
+
+\begin{subfigure}[t]{0.33\textwidth}
+\centering
+\includegraphics[width=\textwidth]{V2017247140000-L2_SNPP_SST.png}
+\caption{Sea surface temperature.}
 \end{subfigure}
-
-\begin{subfigure}[t]{.45\textwidth}
-\caption{QuikSCAT wind on August 15, 2009, showing the wind speed decrease over colder water.}
-\includegraphics[width=\textwidth]{../figures/wind/CapeGhir-qs_l2b_52896_v4.png}
-\end{subfigure}\hspace*{.25cm}
-\begin{subfigure}[t]{.45\textwidth}
-\caption{A phytoplankton bloom in the Benguela upwelling system reveals complex patters Aqua/MODIS image, September 2, 2017. Source: OceanColor \url{https://oceancolor.gsfc.nasa.gov/}}
-\includegraphics[width=\textwidth]{../figures/A2017245125500_BenguelaUpwelling.jpg}
+\begin{subfigure}[t]{0.33\textwidth}
+\centering
+\includegraphics[width=\textwidth]{V2017247140000-L2_SNPP_OC.png}
+\caption{Chlorophyll concentration.}
 \end{subfigure}
+\begin{subfigure}[t]{0.33\textwidth}
+\centering
+\includegraphics[width=\textwidth]{wind_CCPM_20170904.png}
+\caption{Surface wind}
+\end{subfigure}    
+    
+\caption{The Canary Current upwelling system seen through different variables.~$\bullet$~\textbf{Data sources: VIIRS/Suomi NPP for SST and chlorophyll; CCMP for wind.}}
+\end{figure}
 
 
 
+\begin{figure}
+\centering
 
+\begin{subfigure}[t]{0.495\textwidth}
+\centering
+\includegraphics[width=\textwidth]{temp10_1410_008.png}
+\caption{Surface temperature.}
+\end{subfigure}
+\begin{subfigure}[t]{0.495\textwidth}
+\centering
+\includegraphics[width=\textwidth]{vort10_1410_008.png}
+\caption{Relative vorticity (normalised by the planetory vorticity $f$).}
+\end{subfigure}     
+     
+\caption{Numerical simulations of a filament with the ROMS model at an horizontal resolution of 800~m.}
 \end{figure}
 
 
