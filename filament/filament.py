@@ -409,7 +409,7 @@ class Chloro(object):
     """
 
     def __init__(self, lon=None, lat=None, field=None, qflag=None,
-                 year=None, dayofyear=None, date=None):
+                 year=None, dayofyear=None, date=None, fname=None):
         self.lon = lon
         self.lat = lat
         self.field = field
@@ -418,6 +418,7 @@ class Chloro(object):
         self.year = year
         self.dayofyear = dayofyear
         self.date = date
+        self.fname = fname
 
     def read_from_oceancolorL2(self, filename):
         """
@@ -443,6 +444,52 @@ class Chloro(object):
                 # Read geophysical variables
                 self.field = nc.groups['geophysical_data'].variables['chlor_a'][:]
 
+    def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.haline_r,
+                    clim=[0., 3.], vis=False,
+                    cbarloc=[0.18, 0.75, 0.2, 0.015], alpha=1, extend="both"):
+        """
+        ```python
+        chloro.add_to_plot(fig, ax, domain, cmap, clim, date)
+        ```
+        Display the chlorophyll concentrationß field
+
+        Inputs:
+        fig: matplotlib.figure.Figure instance
+        ax: a 'cartopy.mpl.geoaxes.GeoAxesSubplot'
+        domain: a 4-element tuple storing (lonmin, lonmax, latmin, latmax)
+        cmap: the colormap
+        clim: limits of the colorbar
+        date: the date to be added to the plot
+        """
+
+        pcm = ax.pcolormesh(self.lon.data, self.lat.data, self.field, cmap=cmap,
+                            vmin=clim[0], vmax=clim[1], alpha=alpha)
+
+        if domain is not None:
+            ax.set_xlim(domain[0], domain[1])
+            ax.set_ylim(domain[2], domain[3])
+
+        cbar_ax = fig.add_axes(cbarloc)
+
+        if vis is True:
+            textcolor = "w"
+        else:
+            textcolor = "k"
+        cb = plt.colorbar(pcm, orientation="horizontal", cax=cbar_ax, extend=extend)
+        cb.set_label("mg/m$^{3}$", fontsize=12, color=textcolor)
+        cb.ax.xaxis.set_tick_params(color=textcolor)
+        cb.outline.set_edgecolor(textcolor)
+        plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
+        return pcm, cb
+
+    def get_figname(self):
+        """
+        Construct the figure name based on the sensor and the date
+        """
+        figname = os.path.basename(self.fname)
+        figname = os.path.splitext(figname)[0]
+        figname = figname.replace(".", "-")
+        return figname
 
 class Swot(object):
     def __init__(self, lon=None, lat=None, rad=None):
@@ -483,6 +530,9 @@ class Wind(object):
         self.time = time
         self.speed = speed
         self.angle = angle
+
+    def compute_speed(self):
+        self.speed = np.sqrt(self.u * self.u + self.v * self.v)
 
     def read_from_quikscat(self, datafile, domain=[-180., 180., -90., 90.]):
         """
@@ -536,6 +586,9 @@ class Wind(object):
             self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
             self.lon[self.lon > 180.] -= 360.
             time = nc.get_variables_by_attributes(standard_name="time")[0][:]
+            timeunits = nc.get_variables_by_attributes(standard_name="time")[0].units
+            dates = netCDF4.num2date(time, timeunits)
+            self.time = dates
             ntime = len(time)
 
             if domain is not None:
@@ -548,17 +601,34 @@ class Wind(object):
                     # Climatology product
                     self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
                     self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
-                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
+                    try:
+                        self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
+                    except IndexError:
+                        logger.warning("No variable `speed`  in the netCDF file")
+                elif ntime == 4:
+                    # Daily product
+                    self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:, goodlat, goodlon]
+                    self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:, goodlat, goodlon]
+                    try:
+                        self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:, goodlat, goodlon]
+                    except IndexError:
+                        logger.warning("No variable `speed`  in the netCDF file")
                 else:
                     # Monthly product
                     self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
                     self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
-                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
+                    try:
+                        self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
+                    except IndexError:
+                        logger.warning("No variable `speed`  in the netCDF file")
 
             else:
                 self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][:]
                 self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][:]
-                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
+                try:
+                    self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][:]
+                except IndexError:
+                    logger.warning("No variable `speed` in the netCDF file")
 
 
     def read_from_scow(self, ufile, vfile, domain=None):
