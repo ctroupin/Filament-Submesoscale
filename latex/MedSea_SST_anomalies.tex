@@ -1,0 +1,132 @@
+\documentclass[11pt,a4paper,svgnames,final]{beamer}
+\usepackage[orientation=portrait,scale=.9]{beamerposter}
+\usepackage{pgfgantt}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{url}
+\renewcommand\headrulewidth{0pt}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage[skins]{tcolorbox}
+\usepackage{academicons}
+\usepackage{fontawesome}
+\tcbuselibrary{raster}
+
+\DeclareGraphicsExtensions{.pdf,.png,.PNG,.JPG,.jpg,.jpeg,.gif}
+\graphicspath{
+{/data/SST/Global/figures/MedSea/}
+}
+
+\definecolor{mygrey}{HTML}{2D2D2D}%
+\definecolor{myblue}{HTML}{4367AA}
+\definecolor{myorange}{HTML}{FF900E}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{block body}{fg=white}
+
+
+\newfontfamily\titlefont[Path = /home/ctroupin/.fonts/]{Aileron-Thin}
+\newfontfamily\cloudfont[Path = /home/ctroupin/.fonts/]{Tangerine-Bold.ttf}
+\setbeamerfont{title}{size=\fontsize{120}{50}\selectfont,series=\titlefont}
+
+\newcommand{\montant}{\rule{0pt}{1.5cm}}
+
+\setbeamertemplate{headline}{
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+        \vskip4ex
+        \centering
+        
+\usebeamercolor{title in headline}{\color{bg}\usebeamerfont{title}{\selectfont\inserttitle}\\[1ex]}
+
+  \end{beamercolorbox}
+
+  \vskip2ex
+  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line head}
+    \rule{0pt}{2pt}
+  \end{beamercolorbox}
+}
+
+\newlength{\figwidth}
+\setlength{\figwidth}{6cm}
+
+\setbeamertemplate{navigation symbols}{}
+
+
+\title{Sea Surface Temperature anomalies\\ in the Western Mediterranean Sea}
+
+\begin{document}
+
+\begin{columns}[T]
+\begin{column}{2cm}
+
+\end{column}
+
+\begin{column}{.5\textwidth}
+
+\begin{block}
+\large
+\faInfoCircle~~Monthly SST anomalies are computed with respect to the corresponding monthly climatology (2000-2020)\\ 
+\faLink~~Data: MODIS TERRA 4$\mu$m SST (\url{oceancolor.gsfc.nasa.gov/})\\
+\faGithub~~\url{https://github.com/ctroupin/Filament-Submesoscale}\\
+\faWrench~~Python $\bullet$ Matplotlib $\bullet$ \LaTeX\\
+\faCreativeCommons~~Charles Troupin -- GHER (ULiège)
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[width=.95\textwidth]{sst_colorbar.png}
+\end{figure}
+
+\end{column}
+
+\begin{column}{.5\textwidth}
+
+\begin{figure}
+\centering
+\includegraphics[width=.85\textwidth]{MedSea_mean_SST.png}
+\end{figure}
+\end{column}
+\end{columns}
+
+\begin{tabular}{lcccccccccccc}
+huge
+& \textcolor{white}{January} & \textcolor{white}{February} & \textcolor{white}{March} & \textcolor{white}{April} & \textcolor{white}{May} & \textcolor{white}{June} & \textcolor{white}{July} & \textcolor{white}{August} & \textcolor{white}{September} & \textcolor{white}{October} & \textcolor{white}{November} & \textcolor{white}{December} \\
+
+%\textcolor{white}{\raisebox{3cm}{2006}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2006_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2007}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2007_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2008}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2008_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2009}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2009_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2010}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2010_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2011}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2011_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2012}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2012_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2013}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2013_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2014}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2014_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2015}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2015_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2016}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2016_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2017}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2017_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2018}	} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2018_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2019}} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2019_12.png} \\
+
+\textcolor{white}{\raisebox{3cm}{2020}} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_06.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_07.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_08.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_09.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_10.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_11.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_12.png} \\
+
+
+\textcolor{white}{\raisebox{3cm}{2021}} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2020_01.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2021_02.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2021_03.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2021_04.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_2021_05.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} & \includegraphics[width=\figwidth]{MedSea_SSTanomalies_empty.png} \\
+
+\end{tabular}
+
+
+\end{document}
