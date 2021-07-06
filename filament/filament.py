@@ -5,8 +5,8 @@ import datetime
 import numpy as np
 import seawater
 import calendar
-from osgeo import gdal
-from osgeo import osr
+#from osgeo import gdal
+#from osgeo import osr
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -20,6 +20,11 @@ import scipy.io as sio
 import warnings
 import matplotlib.cbook
 from matplotlib import colors
+
+from matplotlib.font_manager import FontProperties
+fa_dir = r"/home/ctroupin/Downloads/fontawesome-free-5.15.3-desktop/otfs/"
+fp1 = FontProperties(fname=os.path.join(fa_dir, "Font Awesome 5 Free-Solid-900.otf"))
+
 from lxml import html
 from bs4 import BeautifulSoup
 import requests
@@ -727,34 +732,41 @@ class Wind(object):
         return res
 
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
-                    date=None, vis=False, clim=[0., 15.], quivscale=200, quivwidth=0.2,
+                    date=None, satname=None, visname=None, clim=[0., 15.],
+                    quivscale=200, quivwidth=0.2,
                     cbarloc='lower right', cbarplot=True):
         """
         ```python
         wind.add_to_plot(fig, ax, domain, cmap, clim=[0, 15], date)
         ```
-        Display the wind field defined by (u, v) on coordinates (lon, lat) as a
+        Display the wind field defined by (u, v) on coordinatess (lon, lat) as as
         quiver plot.
 
         Inputs:
         fig: matplotlib.figure.Figure instance
         ax: a 'cartopy.mpl.geoaxes.GeoAxesSubplot'
         domain: a 4-element tuple storing (lonmin, lonmax, latmin, latmax)
+        visname: a string setting the satellite used for the true color
+        (VIIRS, AQUA, TERRA or NOAA)
         cmap: the colormap
         clim: limits of the colorbar
         date: the date to be added to the plot
         """
 
-        if date is not None:
-            plt.text(0.05, 0.95, date, size=18, rotation=0.,
-                     ha="left", va="top",
-                     transform=ax.transAxes,
-                     bbox=dict(boxstyle="round",
-                               ec=(1., 0.5, 0.5),
-                               fc=(1., 1., 1.),
-                               alpha=.7
-                               )
-                     )
+        windsat_names = {'metopa': 'MetOp-A', 'metopb': 'MetOp-B', 'metopc': 'MetOp-C', }
+        truecolor_names = {'VIIRS': 'Suomi NPP | VIIRS', 'TERRA': 'Terra | MODIS',
+                           'AQUA': 'Aqua | MODIS', 'NOAA': 'NOAA-20 | VIIRS',
+                           'Sentinel-2': 'Sentinel-2'}
+
+        if (satname is not None) & (date is not None) & (visname is not None):
+            textdict = {'fontsize':12, 'ha': "left",
+                'transform':ax.transAxes,
+                'bbox': dict(boxstyle="square", ec=(1., 1., 1.), fc=(1., 1., 1.), alpha=.7)}
+            ax.text(0.01, 1 - 0.06, "\uf7a2", fontproperties=fp1, **textdict, va="bottom")
+            ax.text(0.05, 1 - 0.06, f" {truecolor_names[visname]}", **textdict, va="bottom")
+            ax.text(0.01, 1 - 0.09, "\uf72e", fontproperties=fp1, **textdict, va="top")
+            ax.text(0.05, 1 - 0.09, f" {windsat_names[satname]} | ASCAT ({date})", **textdict, va="top")
+
         qv = ax.quiver(self.lon, self.lat, self.u, self.v, self.speed,
                        scale=quivscale, width=quivwidth, cmap=cmap, clim=clim)
 
@@ -772,7 +784,7 @@ class Wind(object):
         else:
             ext = "both"
 
-        if vis is True:
+        if visname is not None:
             textcolor = "w"
             backcolor = "k"
         else:
@@ -979,11 +991,13 @@ class Altimetry(object):
 class NAO(object):
 
     def __init__(self, values=None, times=None):
-        if len(values) == len(times):
-            self.values = values
-            self.times = times
-        else:
-            logger.error("Values and times have not the same dimension")
+
+        if (values is not None) & (times is not None):
+            if len(values) == len(times):
+                self.values = values
+                self.times = times
+            else:
+                logger.error("Values and times have not the same dimension")
 
 
     def read_from_esrl(self, filename, valex=-999.99):
@@ -1021,7 +1035,7 @@ class NAO(object):
         naovalues[naovalues == valex] = np.nan
         self.values = naovalues
 
-    def read_nao_ucar(self, filename, valex=-999.99):
+    def read_from_ucar(self, filename, valex=-999.99):
         """
         ```python
         read_nao_ucar(filename, valex):
@@ -1055,7 +1069,7 @@ class NAO(object):
         self.values = np.array(naovalues)
         self.values[self.values == valex] = np.nan
 
-    def read_nao_noaa(self, filename, valex=-999.99):
+    def read_from_noaa(self, filename, valex=-999.99):
         """
         ```python
         dates, noavalues = read_nao_ucar(filename):
@@ -1216,7 +1230,7 @@ def get_filelist_url(year, dayofyear):
 
     urllist = []
 
-    for mission in ["metop_a", "metop_b"]:
+    for mission in ["metop_a", "metop_b", "metop_c"]:
         baseurl = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ascat/preview/L2/{}/coastal_opt/{}/{}/contents.html".format(mission, year, str(dayofyear).zfill(3))
         opendapurl = "https://opendap.jpl.nasa.gov:443/opendap/OceanWinds/ascat/preview/L2/{}/coastal_opt/".format(mission)
 
