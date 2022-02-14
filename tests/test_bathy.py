@@ -1,7 +1,10 @@
+import sys
+sys.path.insert(0, '..')
 import os
+import numpy as np
 import glob
 import datetime
-import filament
+from filament import filament
 import unittest
 import logging
 
@@ -9,12 +12,12 @@ import logging
 class TestBathymetry(unittest.TestCase):
 
     def setUp(self):
-        self.datafile = "./python/test/data/E4_2018.dtm"
-        self.assertTrue(os.path.isdir(self.datafile))
+        self.datafile = "./data/E4_2018.dtm"
+        self.assertTrue(os.path.isfile(self.datafile))
 
     def test_read(self):
         bath = filament.Bathymetry()
-
+        bath.read_from_EMODnet_dtm(self.datafile)
         self.assertEqual(len(bath.lon), 9504)
         len(bath.lat) == 9024
         bath.depth.shape == (len(bath.lat), len(bath.lon))

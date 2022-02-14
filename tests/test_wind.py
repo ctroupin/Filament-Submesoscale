@@ -1,5 +1,7 @@
+import sys
+sys.path.insert(0, '..')
 import os
-import filament
+from filament import filament
 import numpy as np
 import unittest
 
@@ -23,7 +25,7 @@ class TestWindList(unittest.TestCase):
 class TestWindQuiscat(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./python/test/data/qs_l2b_52886_v4.0_200908150119.nc"
+        self.windfile = "./data/qs_l2b_52886_v4.0_200908150119.nc"
         self.domain = (-125., -100., 25., 50.)
         self.assertTrue(os.path.isfile(self.windfile))
 
@@ -64,7 +66,7 @@ class TestWindQuiscat(unittest.TestCase):
 class TestWindAscat(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./python/test/data/ascat_20180313_003000_metopa_59134_eps_o_coa_2401_ovw.l2.nc.gz.nc4"
+        self.windfile = "./data/ascat_20180313_003000_metopa_59134_eps_o_coa_2401_ovw.l2.nc.gz.nc4"
         self.domain = (-50., -40., 0., 20.)
         self.domain2 = (100., 140., 0., 20.)
         self.assertTrue(os.path.isfile(self.windfile))
@@ -107,7 +109,7 @@ class TestWindAscat(unittest.TestCase):
 class TestWindCCMP(unittest.TestCase):
 
     def setUp(self):
-        self.windfile = "./python/test/data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
+        self.windfile = "./data/CCMP_Wind_Analysis_201001_V02.0_L3.5_RSS.nc"
         # self.windfile = "https://opendap.jpl.nasa.gov/opendap/OceanWinds/ccmp/L3.5a/monthly/flk/2010/month_20100101_v11l35flk.nc.gz"
         self.domain = (20.12, 40.98, -42.34, -20.)
         # self.assertTrue(os.path.exists(self.windfile))
@@ -122,26 +124,26 @@ class TestWindCCMP(unittest.TestCase):
         self.assertEqual(wind.lat[0], -78.375)
         self.assertEqual(wind.lat[1], -78.125)
         self.assertEqual(wind.u.shape, (1, 628, 1440))
-        self.assertEqual(wind.u.mean(), -0.11586497)
+        self.assertAlmostEqual(wind.u.mean(), -0.11586497, places=7)
 
         wind2 = filament.Wind()
         wind2.read_from_ccmp(self.windfile, self.domain)
         self.assertEqual(wind2.u.shape, (89, 84))
-        self.assertEqual(wind2.u[10, 10], 4.51583)
-        self.assertEqual(wind2.v[20, 20], 0.11376371)
+        self.assertAlmostEqual(wind2.u[10, 10], 4.51583, places=7)
+        self.assertAlmostEqual(wind2.v[20, 20], 0.11376371, places=7)
 
 class TestWindKNMI(unittest.TestCase):
 
     def setUp(self):
         self.windfile = "./data/GLO-WIND_L3-OBS_METOP-A_ASCAT_12_ASC_20190816.nc"
+        self.domain = [0., 12., 40., 45.]
 
-
-    def test_read_ccmp(self):
+    def test_read_knmi(self):
         wind = filament.Wind()
-        wind.read_from_ccmp(self.windfile)
+        wind.read_knmi(self.windfile, domain=self.domain)
         self.assertEqual(wind.u.shape, (40, 96))
-        self.assertEqual(wind.u.mean(), 0.2433392382639504)
         self.assertEqual(wind.v.mean(), 3.195155004428698)
+        self.assertEqual(wind.u.mean(), 0.2433392382639504)
         self.assertEqual(wind.u[10, 20], 1.6600000000000001)
         self.assertTrue(np.ma.is_masked(wind.v[32, 14]))
         self.assertEqual(wind.speed[10, 4], 2.52)
