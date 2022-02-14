@@ -115,14 +115,37 @@ class TestWindCCMP(unittest.TestCase):
     def test_read_ccmp(self):
         wind = filament.Wind()
         wind.read_from_ccmp(self.windfile)
-        len(wind.lon) == 1440
-        len(wind.lat) == 628
-        wind.lon[0] == 0.125
-        wind.lon[1] == 0.375
-        wind.lat[0] == -78.375
-        wind.lat[1] == -78.125
-        wind.u.shape == (1, 628, 1440)
-        wind.u.mean() == -0.11586497
+        self.assertEqual(len(wind.lon), 1440)
+        self.assertEqual(len(wind.lat), 628)
+        self.assertEqual(wind.lon[0], 0.125)
+        self.assertEqual(wind.lon[1], 0.375)
+        self.assertEqual(wind.lat[0], -78.375)
+        self.assertEqual(wind.lat[1], -78.125)
+        self.assertEqual(wind.u.shape, (1, 628, 1440))
+        self.assertEqual(wind.u.mean(), -0.11586497)
+
+        wind2 = filament.Wind()
+        wind2.read_from_ccmp(self.windfile, self.domain)
+        self.assertEqual(wind2.u.shape, (89, 84))
+        self.assertEqual(wind2.u[10, 10], 4.51583)
+        self.assertEqual(wind2.v[20, 20], 0.11376371)
+
+class TestWindKNMI(unittest.TestCase):
+
+    def setUp(self):
+        self.windfile = "./data/GLO-WIND_L3-OBS_METOP-A_ASCAT_12_ASC_20190816.nc"
+
+
+    def test_read_ccmp(self):
+        wind = filament.Wind()
+        wind.read_from_ccmp(self.windfile)
+        self.assertEqual(wind.u.shape, (40, 96))
+        self.assertEqual(wind.u.mean(), 0.2433392382639504)
+        self.assertEqual(wind.v.mean(), 3.195155004428698)
+        self.assertEqual(wind.u[10, 20], 1.6600000000000001)
+        self.assertTrue(np.ma.is_masked(wind.v[32, 14]))
+        self.assertEqual(wind.speed[10, 4], 2.52)
+        self.assertEqual(wind.angle[-1, 40], 210.20000000000002)
 
 if __name__ == '__main__':
     unittest.main()
