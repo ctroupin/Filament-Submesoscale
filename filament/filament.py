@@ -3,10 +3,9 @@ import netCDF4
 import logging
 import datetime
 import numpy as np
-import seawater
+#import seawater
 import calendar
-#from osgeo import gdal
-#from osgeo import osr
+import rasterio
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -14,7 +13,7 @@ from matplotlib.path import Path
 import matplotlib.patheffects as PathEffects
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from geopy.distance import geodesic
+# from geopy.distance import geodesic
 import cmocean
 import scipy.io as sio
 import warnings
@@ -25,7 +24,7 @@ from matplotlib.font_manager import FontProperties
 fa_dir = r"/home/ctroupin/Downloads/fontawesome-free-5.15.3-desktop/otfs/"
 fp1 = FontProperties(fname=os.path.join(fa_dir, "Font Awesome 5 Free-Solid-900.otf"))
 
-from lxml import html
+# from lxml import html
 from bs4 import BeautifulSoup
 import requests
 import cartopy
@@ -55,9 +54,9 @@ class Bathymetry(object):
     def read_from_EMODnet_dtm(self, fname, domain=None):
         """
         Extract the bathymetry from the `.dtm` (tile) file downloaded from
-        [EMODnet Bathymetry]()
+        [EMODnet Bathymetry](https://www.emodnet-bathymetry.eu/)
         If `domain` is defined, the bathymetry is extracted in the domain
-        defined the bounding box `domain` (lonmin, lonmax, latmin, latmax)
+        defined the bounding box (lonmin, lonmax, latmin, latmax)
         """
         with netCDF4.Dataset(fname) as nc:
             lon = nc.get_variables_by_attributes(standard_name="projection_x_coordinate")[0][:]
@@ -79,7 +78,7 @@ class Bathymetry(object):
 
 class SST(object):
     """
-    Sea surface temperature field
+    Sea surface temperature (SST) field
     """
 
     def __init__(self, lon=None, lat=None, field=None, qflag=None,
@@ -181,24 +180,55 @@ class SST(object):
                 self.field = nc.variables["sea_surface_temperature"][0,:,:] - 273.15
                 self.qflag = nc.variables["quality_level"][0,:,:]
 
-    def read_from_cmems(self, datafile, tindex):
-        """
-        Extract the surface temperature from CMEMS-IBI regional model
+    def read_from_cmems(self, datafile, tindex=0, depthindex=0, domain=None):
+        """Extract the surface temperature from CMEMS-IBI regional model
         at the time index `tindex`
         """
+        self.fname = datafile
         with netCDF4.Dataset(datafile, "r") as nc:
-            self.lon = nc.variables["longitude"][:]
-            self.lat = nc.variables["latitude"][:]
-            time = nc.variables["time"][tindex]
+
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            timevar = nc.get_variables_by_attributes(standard_name="time")[0]
+
+            if domain is not None:
+                goodlon = np.where((lon <= domain[1]) & (lon >= domain[0]))[0]
+                goodlat = np.where((lat <= domain[3]) & (lat >= domain[2]))[0]
+                self.lon = lon[goodlon]
+                self.lat = lat[goodlat]
+                self.field = nc.get_variables_by_attributes(standard_name="sea_water_potential_temperature")[0][tindex, depthindex,goodlat, goodlon]
+
+            else:
+                self.lon = lon
+                self.lat = lat
+                self.field = nc.get_variables_by_attributes(standard_name="sea_water_potential_temperature")[0][tindex,depthindex,:,:]
+
+
+            depth = nc.get_variables_by_attributes(standard_name="depth")[0][depthindex]
+
+
+            time = timevar[tindex]
+            timeunits = timevar.units
+            self.date = netCDF4.num2date(time, timeunits)
+
+    def read_from_sentinel3(self, datafile):
+        """Read the sea surface temperature from Sentinel-3 file
+        downloaded using the
+        """
+        with netCDF4.Dataset(datafile, "r") as nc:
+            self.lon = nc.variables["lon"][:]
+            self.lat = nc.variables["lat"][:]
+            self.qflag = nc.variables["quality_level"][0,:,:]
+            self.field = nc.get_variables_by_attributes(standard_name="sea_surface_skin_temperature")[0][0,:,:] - 273.15
+            time = nc.variables["time"][0]
             timeunits = nc.variables["time"].units
             self.date = netCDF4.num2date(time, timeunits)
-            self.field = nc.get_variables_by_attributes(standard_name='sea_water_potential_temperature')[0][tindex,:,:]
 
     def apply_qc(self, qf=1):
         """
         Mask the sst values which don't match the mentioned quality flag
         """
-        self.field = np.ma.masked_where(self.qflag > 1, self.field)
+        self.field = np.ma.masked_where(self.qflag != qf, self.field)
 
 
     def get_title(self):
@@ -238,7 +268,7 @@ class SST(object):
              )
 
     def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.thermal,
-                    clim=[15., 30.], vis=False,
+                    clim=[15., 30.], vis=False, shrink=.8,
                     cbarloc=[0.18, 0.75, 0.2, 0.015], alpha=1):
         """
         ```python
@@ -253,23 +283,32 @@ class SST(object):
         cmap: the colormap
         clim: limits of the colorbar
         date: the date to be added to the plot
+        proj: the Cartopy projection
         """
 
         pcm = ax.pcolormesh(self.lon.data, self.lat.data, self.field, cmap=cmap,
-                            vmin=clim[0], vmax=clim[1], alpha=alpha)
+                    vmin=clim[0], vmax=clim[1], alpha=alpha, transform=ccrs.PlateCarree())
 
         if domain is not None:
-            ax.set_xlim(domain[0], domain[1])
-            ax.set_ylim(domain[2], domain[3])
-
-        cbar_ax = fig.add_axes(cbarloc)
+            ax.set_extent(domain)
+            #ax.set_xlim(domain[0], domain[1])
+            #ax.set_ylim(domain[2], domain[3])
 
         if vis is True:
             textcolor = "w"
         else:
             textcolor = "k"
-        cb = plt.colorbar(pcm, orientation="horizontal", cax=cbar_ax, extend="both")
-        cb.set_label("$^{\circ}$C", fontsize=12, color=textcolor)
+
+            if cbarloc is not None:
+                cbar_ax = fig.add_axes(cbarloc)
+                cb = plt.colorbar(pcm, orientation="horizontal",
+                                  cax=cbar_ax, extend="both")
+            else:
+                cb = plt.colorbar(pcm, orientation="vertical",
+                                  extend="both", shrink=shrink)
+
+        cb.set_label("$^{\circ}$C", fontsize=12, color=textcolor,
+                     rotation=0, ha="left")
         cb.ax.xaxis.set_tick_params(color=textcolor)
         cb.outline.set_edgecolor(textcolor)
         plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
@@ -408,6 +447,49 @@ class SST(object):
                               np.flipud(self.lat[0,:].compressed())))
         return lonrect, latrect
 
+class Current(object):
+    """
+    Ocean current, caracterised by its two components
+    (mmight be merged with Wind object)
+    """
+
+    def __init__(self, lon=None, lat=None, u=None, v=None,
+                 date=None, fname=None):
+        self.lon = lon
+        self.lat = lat
+        self.u = u
+        self.v = v
+        self.date = date
+        self.fname = fname
+
+    def read_from_cmems(self, datafile, tindex=0, depthindex=0, domain=None):
+        with netCDF4.Dataset(datafile) as nc:
+
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            timevar = nc.get_variables_by_attributes(standard_name="time")[0]
+
+            if domain is not None:
+                goodlon = np.where((lon <= domain[1]) & (lon >= domain[0]))[0]
+                goodlat = np.where((lat <= domain[3]) & (lat >= domain[2]))[0]
+                self.lon = lon[goodlon]
+                self.lat = lat[goodlat]
+                self.u = nc.get_variables_by_attributes(standard_name="eastward_sea_water_velocity")[0][tindex, depthindex,goodlat, goodlon]
+                self.v = nc.get_variables_by_attributes(standard_name="northward_sea_water_velocity")[0][tindex, depthindex,goodlat, goodlon]
+
+            else:
+                self.lon = lon
+                self.lat = lat
+                self.u = nc.get_variables_by_attributes(standard_name="eastward_sea_water_velocity")[0][tindex,depthindex,:,:]
+                self.v = nc.get_variables_by_attributes(standard_name="northward_sea_water_velocity")[0][tindex,depthindex,:,:]
+
+
+            depth = nc.get_variables_by_attributes(standard_name="depth")[0][depthindex]
+            time = timevar[tindex]
+            timeunits = timevar.units
+            self.date = netCDF4.num2date(time, timeunits)
+
+
 class Chloro(object):
     """
     Chlorophyll concentration
@@ -434,6 +516,7 @@ class Chloro(object):
         """
 
         if os.path.exists(filename):
+            self.fname = filename
             with netCDF4.Dataset(filename) as nc:
                 # Read platform
                 sat = nc.platform
@@ -537,6 +620,8 @@ class Wind(object):
         self.angle = angle
 
     def compute_speed(self):
+        """Compute the speed using the 2 velocity components
+        """
         self.speed = np.sqrt(self.u * self.u + self.v * self.v)
 
     def read_from_quikscat(self, datafile, domain=[-180., 180., -90., 90.]):
@@ -589,7 +674,7 @@ class Wind(object):
         with netCDF4.Dataset(datafile, "r") as nc:
             self.lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
             self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
-            self.lon[self.lon > 180.] -= 360.
+            # self.lon[self.lon > 180.] -= 360.
             time = nc.get_variables_by_attributes(standard_name="time")[0][:]
             timeunits = nc.get_variables_by_attributes(standard_name="time")[0].units
             dates = netCDF4.num2date(time, timeunits)
@@ -620,10 +705,10 @@ class Wind(object):
                         logger.warning("No variable `speed`  in the netCDF file")
                 else:
                     # Monthly product
-                    self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][goodlat, goodlon]
-                    self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][goodlat, goodlon]
+                    self.u = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][0, goodlat, goodlon]
+                    self.v = nc.get_variables_by_attributes(standard_name="northward_wind")[0][0, goodlat, goodlon]
                     try:
-                        self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][goodlat, goodlon]
+                        self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][0, goodlat, goodlon]
                     except IndexError:
                         logger.warning("No variable `speed`  in the netCDF file")
 
@@ -678,6 +763,49 @@ class Wind(object):
                         self.v[:,:,i] = windstress_vars[i][:, :]
             self.v = np.ma.masked_where(self.v==-9999.0, self.v)
 
+    def read_knmi(self, datafile, domain=[-180., 180., -90., 90.]):
+        """
+        ```python
+        read_knmi(dataurl, domain)
+        ```
+        Read the coordinates, the wind speed and components from the file stored
+        in `datafile` (OPEnDAP) and subset it on the `domain`.
+
+        Inputs:
+        datafile: file path OPEnDAP URL
+        domain: 4-element array storing the domain extension
+
+        """
+        with netCDF4.Dataset(datafile) as nc:
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:].data
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:].data
+            goodlon = np.where((lon <= domain[1]) & (lon >= domain[0]))[0]
+            goodlat = np.where((lat <= domain[3]) & (lat >= domain[2]))[0]
+
+            self.lon = lon[goodlon]
+            self.lat = lat[goodlat]
+
+            timevar = nc.get_variables_by_attributes(standard_name="time")[0]
+            self.dates = netCDF4.num2date(timevar[:], timevar.units, only_use_python_datetimes=True)
+            self.u = nc.get_variables_by_attributes(standard_name="northward_wind")[0][0,goodlat, goodlon]
+            self.v = nc.get_variables_by_attributes(standard_name="eastward_wind")[0][0,goodlat, goodlon]
+            self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][0,goodlat, goodlon]
+            self.angle = nc.get_variables_by_attributes(standard_name="wind_to_direction")[0][0,goodlat, goodlon]
+
+    def get_uv(self):
+        anglerad = np.deg2rad(self.angle)
+        self.u = -self.speed * np.sin(anglerad)
+        self.v = -self.speed * np.cos(anglerad)
+
+    def read_cyms(self, datafile):
+        """Read the data from the netCDF file
+        """
+        with netCDF4.Dataset(datafile) as nc:
+            self.lon = nc.get_variables_by_attributes(standard_name="longitude")[0][0,:,:]
+            self.lat = nc.get_variables_by_attributes(standard_name="latitude")[0][0,:,:]
+            self.speed = nc.variables["wind_speed"][0,:,:]
+            self.angle = nc.variables["wind_from_direction"][0,:,:]
+        self.get_uv()
 
     def read_ascat(self, dataurl, domain=[-180., 180., -90., 90.]):
         """
@@ -732,7 +860,7 @@ class Wind(object):
         return res
 
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
-                    date=None, satname=None, visname=None, clim=[0., 15.],
+                    visname=None, clim=[0., 15.],
                     quivscale=200, quivwidth=0.2,
                     cbarloc='lower right', cbarplot=True):
         """
@@ -750,34 +878,18 @@ class Wind(object):
         (VIIRS, AQUA, TERRA or NOAA)
         cmap: the colormap
         clim: limits of the colorbar
-        date: the date to be added to the plot
         """
 
-        windsat_names = {'metopa': 'MetOp-A', 'metopb': 'MetOp-B', 'metopc': 'MetOp-C', }
-        truecolor_names = {'VIIRS': 'Suomi NPP | VIIRS', 'TERRA': 'Terra | MODIS',
-                           'AQUA': 'Aqua | MODIS', 'NOAA': 'NOAA-20 | VIIRS',
-                           'Sentinel-2': 'Sentinel-2'}
-
-        if (satname is not None) & (date is not None) & (visname is not None):
-            textdict = {'fontsize':12, 'ha': "left",
-                'transform':ax.transAxes,
-                'bbox': dict(boxstyle="square", ec=(1., 1., 1.), fc=(1., 1., 1.), alpha=.7)}
-            ax.text(0.01, 1 - 0.06, "\uf7a2", fontproperties=fp1, **textdict, va="bottom")
-            ax.text(0.05, 1 - 0.06, f" {truecolor_names[visname]}", **textdict, va="bottom")
-            ax.text(0.01, 1 - 0.09, "\uf72e", fontproperties=fp1, **textdict, va="top")
-            ax.text(0.05, 1 - 0.09, f" {windsat_names[satname]} | ASCAT ({date})", **textdict, va="top")
-
         qv = ax.quiver(self.lon, self.lat, self.u, self.v, self.speed,
-                       scale=quivscale, width=quivwidth, cmap=cmap, clim=clim)
+                       scale=quivscale, width=quivwidth, cmap=cmap, clim=clim,
+                       transform=ccrs.PlateCarree())
 
         if domain is not None:
-            ax.set_xlim(domain[0], domain[1])
-            ax.set_ylim(domain[2], domain[3])
+            ax.set_extent(domain)
 
         # Add high-resolution coastline
         #ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
         #                layers=['coastlines'])
-
 
         if clim[0] == 0.:
             ext = "max"
@@ -802,6 +914,8 @@ class Wind(object):
             cb.outline.set_edgecolor(textcolor)
             plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1, foreground=backcolor)])
 
+        return qv
+
 class Visible(object):
 
     def __init__(self, lon=None, lat=None, proj=None, extent=None, image=None):
@@ -821,32 +935,21 @@ class Visible(object):
         Input: imagefile
         -----
         """
-        ds = gdal.Open(imagefile, gdal.GA_ReadOnly)
 
-        # Read the array and the transformation
-        arr = ds.ReadAsArray()
-        # Read the geo transform
-        trans = ds.GetGeoTransform()
-        # Compute the spatial extent
-        self.extent = [trans[0], trans[0] + ds.RasterXSize*trans[1],
-                      trans[3] + ds.RasterYSize*trans[5], trans[3]]
+        with rasterio.open(imagefile) as r:
+            truecolor = r.read()
+            self.image = np.transpose(truecolor, [1,2,0])
+            bbox = r.bounds
+            self.extent = [bbox.left, bbox.right, bbox.bottom, bbox.top]
+            self.proj = r.crs
+            trans = r.transform
 
-        # Get the info on the projection
-        proj = ds.GetProjection()
-        inproj = osr.SpatialReference()
-        inproj.ImportFromWkt(proj)
-        self.proj = inproj
-
-        # Compute the coordinates
-        x = np.arange(0, ds.RasterXSize)
-        y = np.arange(0, ds.RasterYSize)
-
-        xx, yy = np.meshgrid(x, y)
-        self.lon = trans[1] * xx + trans[2] * yy + trans[0]
-        self.lat = trans[4] * xx + trans[5] * yy + trans[3]
-
-        # Transpose
-        self.image = np.transpose(arr, (1, 2, 0))
+            height = truecolor.shape[0]
+            width = truecolor.shape[1]
+            cols, rows = np.meshgrid(np.arange(width), np.arange(height))
+            xs, ys = rasterio.transform.xy(trans, rows, cols)
+            self.lon = np.array(xs)
+            self.lat = np.array(ys)
 
     def list_files(self, datadir, imdate):
         """
@@ -1220,8 +1323,40 @@ def decorate_map(ax, domain, xt, yt):
     ax.set_yticks(yt)
     ax.xaxis.set_major_formatter(lon_formatter)
     ax.yaxis.set_major_formatter(lat_formatter)
-    ax.set_xlim(domain[0], domain[1])
-    ax.set_ylim(domain[2], domain[3])
+    ax.set_extent(domain)
+
+
+def add_vis_wind_caption(ax, visname=None, satname=None, date=None):
+    """Add a text in the corner, based on the satellite names
+    (true color and wind)
+    """
+
+    # Dictionaries with the satellite "long names"
+    windsat_names = {'metopa': 'MetOp-A', 'metopb': 'MetOp-B',
+                     'metopc': 'MetOp-C', 'CCMP': 'CCMP'}
+    truecolor_names = {'VIIRS': 'Suomi NPP | VIIRS', 'TERRA': 'Terra | MODIS',
+                       'AQUA': 'Aqua | MODIS', 'NOAA': 'NOAA-20 | VIIRS',
+                       'Sentinel-2': 'Sentinel-2'}
+
+    # Text properties (box etc)
+    textdict = {'fontsize':10, 'ha': "left",
+        'transform':ax.transAxes,
+        'bbox': dict(boxstyle="square", ec=(1., 1., 1.), fc=(1., 1., 1.), alpha=.7)}
+
+    if (satname is not None) & (date is not None) & (visname is not None):
+        logotext = "\uf7a2\n\uf72e"
+        sattext = f" {truecolor_names[visname]}\n {windsat_names[satname]} | ASCAT ({date})"
+    elif (satname is None) & (visname is not None) & (date is not None):
+        logotext = "\uf7a2"
+        sattext = f" {truecolor_names[visname]}"
+    elif (satname is not None) & (visname is None) & (date is not None):
+        logotext = "\uf72e"
+        sattext = f" {windsat_names[satname]} | ASCAT ({date})"
+
+    ax.text(0.01, 0.97, logotext, fontproperties=fp1, **textdict,
+            va="top")
+    ax.text(0.05, 0.97, sattext, **textdict, va="top")
+
 
 def get_filelist_url(year, dayofyear):
     """
