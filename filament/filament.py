@@ -534,7 +534,7 @@ class Chloro(object):
 
     def add_to_plot(self, fig, ax, domain=None, cmap=cmocean.cm.haline_r,
                     clim=[0., 3.], vis=False,
-                    cbarloc=[0.18, 0.75, 0.2, 0.015], alpha=1, extend="both"):
+                    cbarloc=None, alpha=1, extend="both"):
         """
         ```python
         chloro.add_to_plot(fig, ax, domain, cmap, clim, date)
@@ -557,14 +557,18 @@ class Chloro(object):
             ax.set_xlim(domain[0], domain[1])
             ax.set_ylim(domain[2], domain[3])
 
-        cbar_ax = fig.add_axes(cbarloc)
-
         if vis is True:
             textcolor = "w"
         else:
             textcolor = "k"
-        cb = plt.colorbar(pcm, orientation="horizontal", cax=cbar_ax, extend=extend)
-        cb.set_label("mg/m$^{3}$", fontsize=12, color=textcolor)
+
+        if cbarloc is not None:
+            cbar_ax = fig.add_axes(cbarloc)
+            cb = plt.colorbar(pcm, orientation="horizontal", cax=cbar_ax, extend=extend)
+        else:
+            cb = plt.colorbar(pcm, orientation="vertical", extend=extend)
+
+        cb.set_label("mg/m$^{3}$", fontsize=12, color=textcolor, rotation=0, ha="left")
         cb.ax.xaxis.set_tick_params(color=textcolor)
         cb.outline.set_edgecolor(textcolor)
         plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor)
@@ -862,7 +866,7 @@ class Wind(object):
     def add_to_plot(self, fig, ax, domain=None, cmap=plt.cm.hot_r,
                     visname=None, clim=[0., 15.],
                     quivscale=200, quivwidth=0.2,
-                    cbarloc='lower right', cbarplot=True):
+                    cbarloc='lower right', cbarplot=True, zorder=5):
         """
         ```python
         wind.add_to_plot(fig, ax, domain, cmap, clim=[0, 15], date)
