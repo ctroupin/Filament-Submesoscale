@@ -1,0 +1,14 @@
+figure.figsize : 12, 8
+axes.titlesize : 24
+axes.labelsize : 20
+lines.linewidth : 3
+lines.markersize : 10
+xtick.labelsize : 16
+ytick.labelsize : 16
+savefig.dpi:       300      # figure dots per inch or 'figure'
+savefig.facecolor: white       # figure face color when saving
+savefig.edgecolor: white        # figure edge color when saving
+savefig.format:    jpg         # {png, ps, pdf, svg}
+savefig.bbox:      tight
+font.family:  serif
+font.serif: Times New Roman
