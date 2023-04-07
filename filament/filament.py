@@ -931,9 +931,10 @@ class Wind(object):
             axins1 = inset_axes(ax, width="35%", height="3.5%", loc=cbarloc, borderpad=4)
             axins1.xaxis.set_ticks_position("bottom")
             cb = plt.colorbar(qv, cax=axins1, extend=ext, orientation="horizontal")
-            cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=12,
+            cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=10,
                      color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
                                                         foreground=backcolor)])
+            cb.ax.tick_params(labelsize=8)
             cb.ax.xaxis.set_tick_params(color=textcolor)
             cb.outline.set_edgecolor(textcolor)
             plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1, foreground=backcolor)])
