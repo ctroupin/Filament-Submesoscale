@@ -77,7 +77,7 @@ end
 """
     read_sst_oceancolor_L3(datafile, domain)
 
-Extrat the SST and the coordinates from the netCDF `datafile` in the region
+Extract the SST and the coordinates from the netCDF `datafile` in the region
 defined by `domain` (lonmin, lonmax, latmin, latmax).
 
 ## Example
@@ -90,17 +90,20 @@ function read_sst_oceancolor_L3(datafile::String, domain::Array)
     NCDatasets.Dataset(datafile) do nc
         lon = nc["lon"][:]
         lat = nc["lat"][:]
-        goodlon = (lon .< domain[2]) .& (lon .> domain[1])
-        goodlat = (lat .< domain[4]) .& (lat .> domain[3])
-        sst = nc["sst4"][goodlon, goodlat]
-        return coalesce.(lon[goodlon], NaN), coalesce.(lat[goodlat], NaN), coalesce.(sst, NaN)
+        goodlon = findall((lon .< domain[2]) .& (lon .> domain[1]))
+        lon = lon[goodlon]
+        sst = nc["sst4"][goodlon,:]
+        goodlat = findall((lat .< domain[4]) .& (lat .> domain[3]))
+        lat = lat[goodlat]
+        sst = sst[:,goodlat]
+        return coalesce.(lon, NaN), coalesce.(lat, NaN), coalesce.(sst, NaN)
     end
 end
 
 """
     create_sst_file(filename, lons, lats, times, sstanom, mask)
 
-Write the coordinates `lons`, `lates`, the times `times` and the SST anomalies
+Write the coordinates `lons`, `lats`, the times `times` and the SST anomalies
 `sstanom` in the netCDF file `filename`.
 
 ## Example
@@ -148,11 +151,108 @@ function create_sst_file(filename::String, lons, lats, times, sstanom, mask; val
         ds.attrib["data URL"] = "https://oceandata.sci.gsfc.nasa.gov/MODIS-Terra/Mapped/Monthly/9km/"
         ds.attrib["author"] = "C. Troupin, ctroupin@uliege"
         ds.attrib["tool"] = "create_nc_tile"
-        ds.attrib["institution_url"] = "http://modb.oce.ulg.ac.be/"
+        ds.attrib["institution_url"] = "https://www.gher.uliege.be"
 
         # Define variables
         ncmask[:] = mask
         ncsst[:] = sstanom
+        nctime[:] = times
+        nclon[:] = lons
+        nclat[:] = lats;
+
+    end
+end
+
+"""
+    read_chloro_oceancolor_L3(datafile, domain)
+
+Extract the chlorophyll concentration and the coordinates from the netCDF `datafile` in the region
+defined by `domain` (lonmin, lonmax, latmin, latmax).
+
+## Example
+```julia-repl
+lon, lat, sst = read_chloro_oceancolor_L3(datafile, [-20, -8., 25., 33.])
+```
+"""
+function read_chloro_oceancolor_L3(datafile::String, domain::Array)
+
+    NCDatasets.Dataset(datafile) do nc
+        lon = nc["lon"][:]
+        lat = nc["lat"][:]
+        goodlon = findall((lon .< domain[2]) .& (lon .> domain[1]))
+        lon = lon[goodlon]
+        chloro = nc["chlor_a"][goodlon,:]
+        goodlat = findall((lat .< domain[4]) .& (lat .> domain[3]))
+        lat = lat[goodlat]
+        chloro = chloro[:,goodlat]
+        return coalesce.(lon, NaN), coalesce.(lat, NaN), coalesce.(chloro, NaN)
+    end
+end
+
+"""
+    create_chloro_file(filename, lons, lats, times, chloro, mask)
+
+Write the coordinates `lons`, `lats`, the times `times` and the SST anomalies
+`sstanom` in the netCDF file `filename`.
+
+## Example
+
+"""
+function create_chloro_file(filename::String, lons, lats, times, chloro, mask; valex=-999.9)
+    Dataset(filename, "c") do ds
+
+        # Dimensions
+        ds.dim["lon"] = length(lons)
+        ds.dim["lat"] = length(lats)
+        ds.dim["time"] = Inf # unlimited dimension
+
+        # Declare variables
+        ncchloro = defVar(ds,"chloro", Float64, ("lon", "lat", "time"))
+        ncchloro.attrib["missing_value"] = Float64(valex)
+        ncchloro.attrib["long_name"] = "Chlorophyll Concentration, OCI Algorithm"
+		ncchloro.attrib["units"] = "mg m^-3"
+		ncchloro.attrib["standard_name"] = "mass_concentration_of_chlorophyll_in_sea_water"
+		ncchloro.attrib["_FillValue"] = Float64(valex)
+		ncchloro.attrib["valid_min"] = 0.001
+		ncchloro.attrib["valid_max"] = 100.
+
+        ncchloro.attrib["long_name"] = "mass_concentration_of_chlorophyll_in_sea_wate"
+        ncchloro.attrib["standard_name"] = "mass_concentration_of_chlorophyll_in_sea_water"
+        ncchloro.attrib["_FillValue"] = Float64(valex)
+        ncchloro.attrib["units"] = "degree_C"
+
+        ncmask = defVar(ds,"mask", Int64, ("lon", "lat"))
+        ncmask.attrib["long_name"] = "land sea mask"
+
+        nctime = defVar(ds,"time", Float32, ("time",))
+        nctime.attrib["missing_value"] = Float32(valex)
+        nctime.attrib["units"] = "days since 1981-01-01 00:00:00"
+        nctime.attrib["time"] = "time"
+
+        nclon = defVar(ds,"lon", Float32, ("lon",))
+        nclon.attrib["missing_value"] = Float32(valex)
+        nclon.attrib["_FillValue"] = Float32(valex)
+        nclon.attrib["units"] = "degrees East"
+        nclon.attrib["lon"] = "longitude"
+
+        nclat = defVar(ds,"lat", Float32, ("lat",))
+        nclat.attrib["missing_value"] = Float32(valex)
+        nclat.attrib["_FillValue"] = Float32(valex)
+        nclat.attrib["units"] = "degrees North"
+        nclat.attrib["lat"] = "latitude"
+
+        # Global attributes
+        ds.attrib["institution"] = "GHER - University of Liège"
+        ds.attrib["title"] = "Chlorophyll concentration from MODIS TERRA"
+        ds.attrib["comment"] = "Original data by Ocean Color"
+        ds.attrib["data URL"] = "https://oceandata.sci.gsfc.nasa.gov/MODIS-Terra/Mapped/Monthly/9km/"
+        ds.attrib["author"] = "C. Troupin, ctroupin@uliege"
+        ds.attrib["tool"] = "create_nc_tile"
+        ds.attrib["institution_url"] = "https://www.gher.uliege.be"
+
+        # Define variables
+        ncmask[:] = mask
+        ncchloro[:] = chloro
         nctime[:] = times
         nclon[:] = lons
         nclat[:] = lats;

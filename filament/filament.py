@@ -21,8 +21,8 @@ import matplotlib.cbook
 from matplotlib import colors
 
 from matplotlib.font_manager import FontProperties
-fa_dir = r"/home/ctroupin/Downloads/fontawesome-free-5.15.3-desktop/otfs/"
-fp1 = FontProperties(fname=os.path.join(fa_dir, "Font Awesome 5 Free-Solid-900.otf"))
+fa_dir = r"/home/ctroupin/.fonts/"
+fp1 = FontProperties(fname=os.path.join(fa_dir, "Font Awesome 6 Free-Solid-900.otf"))
 
 # from lxml import html
 from bs4 import BeautifulSoup
@@ -506,6 +506,26 @@ class Chloro(object):
         self.dayofyear = dayofyear
         self.date = date
         self.fname = fname
+
+    def read_from_copernicus(self, filename, bbox=[-180., 180., -90., 90.]):
+        """
+        Load the chlorophyll concentration from netCDF level-3 file
+        obtained from [Copernicus Marine Service](https://oceancolor.gsfc.nasa.gov) FTP
+        :param filename: name of the netCDF file
+        :return: lon, lat, field, qflag, year, dayofyear
+        """
+        if os.path.exists(filename):
+            self.fname = filename
+            with netCDF4.Dataset(filename) as nc:
+                lon = nc.variables["lon"][:]
+                goodlon = np.where((lon <= bbox[1]) & (lon >= bbox[0]))[0]
+                self.lon = lon[goodlon]
+                lat = nc.variables["lat"][:]
+                goodlat = np.where((lat <= bbox[3]) & (lat >= bbox[2]))[0]
+                self.lat = lat[goodlat]
+                self.field = nc.variables["CHL"][0,goodlat[0]:goodlat[-1], goodlon[0]:goodlon[-1]]
+                timevar = nc.variables["time"]
+                self.date = netCDF4.num2date(timevar[0], timevar.units, only_use_cftime_datetimes=False, only_use_python_datetimes=True)
 
     def read_from_oceancolorL2(self, filename):
         """
