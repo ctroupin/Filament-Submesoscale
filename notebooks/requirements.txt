@@ -31,7 +31,7 @@ matplotlib-inline==0.1.6
 nest-asyncio==1.5.5
 netCDF4==1.6.3
 numpy==1.23.3
-OWSLib==0.27.2
+OWSLib==0.28.1
 packaging==21.3
 pandas==1.5.1
 parso==0.8.3
