@@ -18,7 +18,7 @@ debugpy==1.6.3
 decorator==5.1.1
 entrypoints==0.4
 executing==1.1.0
-fonttools==4.37.3
+fonttools==4.43.0
 idna==3.4
 ipykernel==6.15.3
 ipython==8.10.0
