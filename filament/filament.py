@@ -827,19 +827,19 @@ class Wind(object):
             self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[0][0,goodlat, goodlon]
             self.angle = nc.get_variables_by_attributes(standard_name="wind_to_direction")[0][0,goodlat, goodlon]
 
-    def read_from_cmems():
-        with netCDF4.Dataset("./cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H_2024051223_R20240512T12_11.nc") as ds:
+    def read_from_cmems(self, datafile, domain=[-180., 180., -90., 90.]):
+        with netCDF4.Dataset(datafile) as ds:
             lon = ds.get_variables_by_attributes(standard_name = "longitude")[0][:]
             lat = ds.get_variables_by_attributes(standard_name = "latitude")[0][:]
+            goodlon = np.where((lon >= domain[0]) & (lon <= domain[1]))[0]
+            goodlat = np.where((lat >= domain[2]) & (lat <= domain[3]))[0]
 
             self.lon = lon[goodlon]
             self.lat = lat[goodlat]
 
-            timevar = nc.get_variables_by_attributes(standard_name="time")[0]
+            timevar = ds.get_variables_by_attributes(standard_name="time")[0]
             self.dates = netCDF4.num2date(timevar[:], timevar.units, only_use_python_datetimes=True)
 
-            goodlon = np.where((lon >= domain[0]) & (lon <= domain[1]))[0]
-            goodlat = np.where((lat >= domain[2]) & (lat <= domain[3]))[0]
             self.u = ds.get_variables_by_attributes(standard_name="eastward_wind")[0][0,goodlat, goodlon]
             self.v = ds.get_variables_by_attributes(standard_name="northward_wind")[0][0,goodlat, goodlon]
 
