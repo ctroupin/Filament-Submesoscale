@@ -237,9 +237,9 @@ class SST(object):
         """
         with netCDF4.Dataset(self.fname, "r") as nc:
             try:
-                titletext = "{} ({}) {}".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d"))
+                titletext = "{} {} ({})".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d %H:%M:%S"))
             except AttributeError:
-                titletext = "{} ({}) {}".format(nc.sensor, nc.platform, self.date.strftime("%Y-%m-%d"))
+                titletext = "{} {} ({})".format(nc.sensor, nc.platform, self.date.strftime("%Y-%m-%d %H:%M:%S"))
         return titletext
 
     def get_figname(self):
@@ -602,6 +602,17 @@ class Chloro(object):
         figname = os.path.splitext(figname)[0]
         figname = figname.replace(".", "-")
         return figname
+    
+    def get_title(self):
+        """
+        Construct the title string based on the sensor, platform and date
+        """
+        with netCDF4.Dataset(self.fname, "r") as nc:
+            try:
+                titletext = "{} {} ({})".format(nc.instrument, nc.platform, self.date.strftime("%Y-%m-%d %H:%M:%S"))
+            except AttributeError:
+                titletext = "{} {} ({})".format(nc.sensor, nc.platform, self.date.strftime("%Y-%m-%d %H:%M:%S"))
+        return titletext
 
 class Swot(object):
     def __init__(self, lon=None, lat=None, rad=None):
