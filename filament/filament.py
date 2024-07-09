@@ -3,21 +3,13 @@ import netCDF4
 import logging
 import datetime
 import numpy as np
-#import seawater
 import calendar
 import rasterio
-from scipy import interpolate
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.path import Path
 import matplotlib.patheffects as PathEffects
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-# from geopy.distance import geodesic
 import cmocean
-import scipy.io as sio
-import warnings
-import matplotlib.cbook
 from matplotlib import colors
 
 from matplotlib.font_manager import FontProperties
@@ -27,18 +19,34 @@ fp1 = FontProperties(fname=os.path.join(fa_dir, "Font Awesome 6 Free-Solid-900.o
 # from lxml import html
 from bs4 import BeautifulSoup
 import requests
-import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import cartopy.mpl.ticker as cartopyticker
 myproj = ccrs.PlateCarree()
-coast = cfeature.GSHHSFeature(scale="full")
-lon_formatter = cartopyticker.LongitudeFormatter()
-lat_formatter = cartopyticker.LatitudeFormatter()
+datacrs = ccrs.PlateCarree()
+
+coast_f = cfeature.GSHHSFeature(scale="full")
+coast_h = cfeature.GSHHSFeature(scale="h")
+coast_i = cfeature.GSHHSFeature(scale="i")
 
 logger = logging.getLogger("Filament")
 
-warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
+# Dictionary with the regions
+
+regions = {
+        "mediumdomain": (-19., -6., 25., 35.),
+        "smalldomain" : (-15., -9., 27., 33.),
+        "tinydomain" : (-12., -9., 29.5, 32.),
+        "canarydomain" : (-19., -13., 26., 30.),
+        "medseadomain" : (-2.5, 0., 36., 37.),
+        "westmed" : (-5., 10., 35., 46.),
+        "cretedomain" : (23., 27., 34., 36.5),
+        "sidedomain" : (29.9, 33, 34.9, 37.25),
+        "capeblanc" : (-22.5, -15.5, 17.5, 23.75),
+        "capeghir" : ( -12.5, -9.25, 29., 32),
+        "alboran" : (-5.6, -2.6, 34.8, 37.54),
+        "bergen" : (1.5, 6.5, 58, 62.5),
+        "galicia" : (-12., -5., 40.5, 46.),
+}
 
 
 class Bathymetry(object):
@@ -215,6 +223,7 @@ class SST(object):
         """Read the sea surface temperature from Sentinel-3 file
         downloaded using the
         """
+        self.fname = datafile
         with netCDF4.Dataset(datafile, "r") as nc:
             self.lon = nc.variables["lon"][:]
             self.lat = nc.variables["lat"][:]
@@ -446,6 +455,19 @@ class SST(object):
                               np.flipud(self.lat[:,-1].compressed()),
                               np.flipud(self.lat[0,:].compressed())))
         return lonrect, latrect
+    
+    def get_limits(self, domain=[-180., 180., -90., 90.], valex=-32767.0):
+        
+        goodcords = np.where( (self.lon[:] <= domain[1]) 
+                            & (self.lon[:] >= domain[0]) 
+                            & (self.lat[:] <= domain[3]) 
+                            & (self.lat[:] >= domain[2]))
+        sstdomain = self.field[goodcords]
+        goodvals = (sstdomain > 10.)
+        sstmin = np.ceil(np.percentile(sstdomain[goodvals], 1.))
+        sstmax = np.floor(np.percentile(sstdomain[goodvals], 99.))
+
+        return sstmin, sstmax
 
 class Current(object):
     """
@@ -1060,7 +1082,7 @@ class Altimetry(object):
     """
 
     def __init__(self, lon=None, lat=None, sla=None, u=None, v=None,
-                 time=None, date=None, speed=None):
+                 time=None, date=None, speed=None, fname=None):
         self.lon = lon
         self.lat = lat
         self.sla = sla
@@ -1079,6 +1101,7 @@ class Altimetry(object):
         """
 
         if os.path.exists(filename):
+            self.fname = filename
             with netCDF4.Dataset(filename) as nc:
                 self.lon = nc.get_variables_by_attributes(standard_name='longitude')[0][:]
                 self.lat = nc.get_variables_by_attributes(standard_name='latitude')[0][:]
@@ -1143,6 +1166,17 @@ class Altimetry(object):
         self.sla = self.sla[goodlat, :]
         self.sla = self.sla[:, goodlon]
 
+    def get_figname(self):
+        """
+        Construct the figure name based on the sensor and the date
+        """
+        # with netCDF4.Dataset(filename, "r") as nc:
+        #    figname = "-".join((nc.instrument, self.date.strftime("%Y_%m_%d")))
+        figname = os.path.basename(self.fname)
+        figname = os.path.splitext(figname)[0]
+        figname = figname.replace(".", "-")
+        return figname
+    
 class NAO(object):
 
     def __init__(self, values=None, times=None):
@@ -1355,28 +1389,6 @@ def change_wall_prop(ax, coordinates, depths, angles):
 
     ax.set_zticks(np.arange(depths[0],depths[1]+10,depths[2]))
     ax.set_zticklabels(range(int(-depths[0]),-int(depths[1])-10,-int(depths[2])))
-
-def decorate_map(ax, domain, xt, yt):
-    """
-    ```python
-    decorate_map(ax, domain, xt, yt)
-    ```
-    Add labels to the map axes and limit the extent according the selected
-    `domain`.
-
-    Inputs:
-    ------
-    ax: a cartopy ax instance
-    domain: a 4-element array storing lonmin, lonmax, latmin, latmax
-    xt: array storing the xticks locations
-    yt: array storing the yticks locations
-    """
-    ax.set_xticks(xt)
-    ax.set_yticks(yt)
-    ax.xaxis.set_major_formatter(lon_formatter)
-    ax.yaxis.set_major_formatter(lat_formatter)
-    ax.set_extent(domain)
-
 
 def add_vis_wind_caption(ax, visname=None, satname=None, date=None):
     """Add a text in the corner, based on the satellite names
