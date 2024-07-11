@@ -6,6 +6,7 @@ lines.markersize : 10
 xtick.labelsize : 16
 ytick.labelsize : 16
 savefig.dpi:       300      # figure dots per inch or 'figure'
+axes.facecolor: white
 savefig.facecolor: white       # figure face color when saving
 savefig.edgecolor: white        # figure edge color when saving
 savefig.format:    png         # {png, ps, pdf, svg}
