@@ -4,12 +4,11 @@ Cartopy==0.23.0
 cftime==1.6.3
 cmocean==4.0.3
 cycler==0.12.1
-GDAL==2.2.2
 geopy==2.4.1
 lxml>=4.6.2
 matplotlib==3.8.4
 netCDF4==1.6.5
-numpy>=1.22
+numpy==1.26.3
 pyparsing==3.1.2
 pyshp==2.3.1
 python-dateutil==2.9.0
