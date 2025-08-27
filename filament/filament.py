@@ -881,6 +881,45 @@ class Wind(object):
             self.angle = nc.variables["wind_from_direction"][0,:,:]
         self.get_uv()
 
+    def read_from_sentinel1(self, datafile, domain=[-180.0, 180.0, -90.0, 90.0]):
+        with netCDF4.Dataset(datafile, "r") as nc:
+            t = nc.variables["time"][0]
+            timeunits = nc.variables["time"].units
+            self.time = netCDF4.num2date(t, timeunits)
+            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
+            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+
+            logger.info(lon.shape)
+
+            # Check if we have data in the domain of interest
+            goodlon = (lon <= domain[1]) & (lon >= domain[0])
+            goodlat = (lat <= domain[3]) & (lat >= domain[2])
+
+            logger.info(goodlon)
+            if len(goodlat) * len(goodlat) > 0:
+                ngood = 1
+            if ngood > 0:
+                logger.info("Subsetting data to region of interest")
+                self.lon = lon[goodlon]
+                self.lat = lat[goodlat]
+                self.speed = nc.get_variables_by_attributes(standard_name="wind_speed")[
+                    1
+                ][0, goodlat, goodlon]
+                self.angle = nc.get_variables_by_attributes(
+                    standard_name="wind_to_direction"
+                )[1][0, goodlat, goodlon]
+
+                self.u = -1. * nc.get_variables_by_attributes(standard_name="eastward_wind")[
+                    1
+                ][0, goodlat, goodlon]
+                self.v = -1. * nc.get_variables_by_attributes(standard_name="northward_wind")[
+                    1
+                ][0, goodlat, goodlon]
+                res = True
+            else:
+                logger.info("No data in the region of interest")
+                res = False
+
     def read_ascat(self, dataurl, domain=[-180., 180., -90., 90.]):
         """
         ```python
@@ -978,16 +1017,16 @@ class Wind(object):
             backcolor = "w"
 
         if cbarplot is True:
-            axins1 = inset_axes(ax, width="35%", height="3.5%", loc=cbarloc, borderpad=4)
-            axins1.xaxis.set_ticks_position("bottom")
-            cb = plt.colorbar(qv, cax=axins1, extend=ext, orientation="horizontal")
-            cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=10,
+            #axins1 = inset_axes(ax, width="35%", height="3.5%", loc=cbarloc, borderpad=4)
+            #axins1.xaxis.set_ticks_position("bottom")
+            cb = plt.colorbar(qv, extend=ext, orientation="vertical")
+            cb.set_label("m/s (max. = {:.1f})".format(self.speed.max()), fontsize=10, rotation=0,
                      color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1,
                                                         foreground=backcolor)])
             cb.ax.tick_params(labelsize=8)
             cb.ax.xaxis.set_tick_params(color=textcolor)
-            cb.outline.set_edgecolor(textcolor)
-            plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1, foreground=backcolor)])
+            #cb.outline.set_edgecolor(textcolor)
+            #plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textcolor, path_effects=[PathEffects.withStroke(linewidth=1, foreground=backcolor)])
 
         return qv
 
